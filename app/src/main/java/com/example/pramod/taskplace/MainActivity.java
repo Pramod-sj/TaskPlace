@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             storage.getReference().child("images/" + new CurrentUserData(this).getCurrentUID()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
-                    Picasso.with(MainActivity.this).load(uri).into(circleImageView);
+                    Picasso.with(MainActivity.this).load(uri).placeholder(R.drawable.placeholder).into(circleImageView);
                 }
             });
         }

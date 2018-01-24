@@ -41,7 +41,7 @@ public class DevCustomAdapter extends RecyclerView.Adapter<DevCustomAdapter.View
     public void onBindViewHolder(DevCustomAdapter.ViewHolder holder, int position) {
         holder.name.setText(devnames[position]);
         holder.email.setText(devemails[position]);
-        Picasso.with(context).load(images[position]).resize(240, 120).into(holder.dp);
+        Picasso.with(context).load(images[position]).placeholder(R.drawable.placeholder).into(holder.dp);
         Log.i("data",devnames[position]);
     }
 
