@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "810303124847",
+    "firebase_url": "https://taskloc-ee79b.firebaseio.com",
+    "project_id": "taskloc-ee79b",
+    "storage_bucket": "taskloc-ee79b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:810303124847:android:f7b995d502e5aa1d",
+        "android_client_info": {
+          "package_name": "com.example.pramod.taskplace"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "810303124847-v10ouqpqqodiljch9r5l426mc8muro6u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAg4vdxuQp5yUmNrMhQtrUhdtAOr9b7KIU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
