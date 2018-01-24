@@ -18,8 +18,8 @@ public class DevPage extends AppCompatActivity{
     final String[] devemails={"pramodsinghjantwal@gmail.com","ashish@gmail.com","abhishek@gmail.com"};
     final String devnames[]={"Pramod SJ","Ashish K","Abhishek S"};
     private final String devdp[] = {
-            "http://api.learn2crack.com/android/images/donut.png",
-            "http://api.learn2crack.com/android/images/eclair.png",
+            "https://github.com/Pramod-sj/TaskPlace/raw/master/DevDP/pramod.jpg",
+            "https://github.com/Pramod-sj/TaskPlace/raw/master/DevDP/ashish.jpg",
             "http://api.learn2crack.com/android/images/froyo.png",
     };
 
