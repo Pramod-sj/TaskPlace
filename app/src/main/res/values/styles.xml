@@ -15,6 +15,7 @@
     <style name="SplashScreen" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:background">@drawable/splashscreen</item>
         <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
