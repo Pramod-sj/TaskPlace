@@ -26,8 +26,16 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="95dp"
-            android:background="@drawable/cardbg"
-            />
+            android:orientation="horizontal"
+            android:background="@drawable/cardbg">
+            <TextView
+                android:id="@+id/devStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="8dp"
+                android:textColor="#ffffff"/>
+        </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"

@@ -23,13 +23,15 @@ public class DevCustomAdapter extends RecyclerView.Adapter<DevCustomAdapter.View
     String[] devnames;
     String[] devemails;
     String[] images;
+    String[] devstatus;
     Context context;
 
-    public DevCustomAdapter(Context context,String[] devnames,String[] devemails,String[] images){
+    public DevCustomAdapter(Context context,String[] devnames,String[] devemails,String[] images,String[] devstatus){
         this.context=context;
         this.devnames=devnames;
         this.devemails=devemails;
         this.images=images;
+        this.devstatus=devstatus;
     }
     @Override
     public DevCustomAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -41,6 +43,7 @@ public class DevCustomAdapter extends RecyclerView.Adapter<DevCustomAdapter.View
     public void onBindViewHolder(DevCustomAdapter.ViewHolder holder, int position) {
         holder.name.setText(devnames[position]);
         holder.email.setText(devemails[position]);
+        holder.devStatus.setText(devstatus[position]);
         Picasso.with(context).load(images[position]).placeholder(R.drawable.placeholder).into(holder.dp);
         Log.i("data",devnames[position]);
     }
@@ -53,11 +56,13 @@ public class DevCustomAdapter extends RecyclerView.Adapter<DevCustomAdapter.View
         private TextView name;
         private CircleImageView dp;
         private TextView email;
+        private TextView devStatus;
         public ViewHolder(View view) {
                 super(view);
                 email=view.findViewById(R.id.devEmail);
-                name = (TextView)view.findViewById(R.id.devName);
-                dp = (CircleImageView) view.findViewById(R.id.devImageProfile);
+                name = view.findViewById(R.id.devName);
+                devStatus=view.findViewById(R.id.devStatus);
+                dp = view.findViewById(R.id.devImageProfile);
             }
 
     }

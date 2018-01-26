@@ -55,6 +55,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".AboutActivity"/>
+        <service android:name=".OnRecentClearService" android:stopWithTask="false"/>
     </application>
 
 </manifest>

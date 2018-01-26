@@ -15,12 +15,13 @@ import java.util.ArrayList;
 
 public class DevPage extends AppCompatActivity{
     RecyclerView recyclerView;
-    final String[] devemails={"pramodsinghjantwal@gmail.com","ashish@gmail.com","abhishek@gmail.com"};
+    final String[] devemails={"pramodsinghjantwal@gmail.com","ashishkokane1605@gmail.com","abhishek.as208@gmail.com"};
     final String devnames[]={"Pramod SJ","Ashish K","Abhishek S"};
+    final String devStatus[]={"Lead Developer","Developer","Logo Designer"};
     private final String devdp[] = {
             "https://github.com/Pramod-sj/TaskPlace/raw/master/DevDP/pramod.jpg",
             "https://github.com/Pramod-sj/TaskPlace/raw/master/DevDP/ashish.jpg",
-            "http://api.learn2crack.com/android/images/froyo.png",
+            "https://github.com/Pramod-sj/TaskPlace/raw/master/DevDP/abhishek.jpg",
     };
 
     @SuppressLint("ResourceType")
@@ -33,7 +34,7 @@ public class DevPage extends AppCompatActivity{
         //devnames=getResources().getStringArray(R.id.devName);
         LinearLayoutManager layoutManager=new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        DevCustomAdapter adapter=new DevCustomAdapter(this,devnames,devemails,devdp);
+        DevCustomAdapter adapter=new DevCustomAdapter(this,devnames,devemails,devdp,devStatus);
         recyclerView.setAdapter(adapter);
     }
 }

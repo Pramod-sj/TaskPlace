@@ -152,13 +152,13 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver implements Goog
     public void getGeofencesFromDatabase() {
         LANDMARKS = new HashMap<String, LatLng>();
         taskDetailsCloudEndPoint = FirebaseDatabase.getInstance().getReference().child("Users");
-        Toast.makeText(contextBootReceiver, "Getting data", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(contextBootReceiver, "Getting data", Toast.LENGTH_SHORT).show();
 
         taskDetailsCloudEndPoint.child(new CurrentUserData(contextBootReceiver).getCurrentUID()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.exists()) {
-                    Toast.makeText(contextBootReceiver, "not populating", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(contextBootReceiver, "not populating", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {

@@ -93,17 +93,20 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
             @Override
             public void onClick(View view) {
                 if(dataCount!=0) {
-                    Toast.makeText(getActivity().getApplicationContext(), "started", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getActivity().getApplicationContext(), "started", Toast.LENGTH_SHORT).show();
                     startGeofences();
                 }
                 else{
-                    Snackbar.make(getActivity().findViewById(R.id.linearlayoutmap),"Please set some task",Snackbar.LENGTH_SHORT).setAction("set task", new View.OnClickListener() {
+                    Snackbar s=Snackbar.make(getActivity().findViewById(R.id.linearlayoutmap),"Please set some task",Snackbar.LENGTH_SHORT);
+                    s.setAction("set task", new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             Fragment fragment = new SetTask();
                             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flContent, fragment).commit();
                         }
-                    }).show();
+                    });
+                    s.show();
+                    menu.animate().translationYBy(s.getView().getHeight());
                 }
             }
         });
@@ -112,13 +115,12 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
             @Override
             public void onClick(View view) {
                 if(dataCount!=0) {
-                    Toast.makeText(getActivity().getApplicationContext(), "stop", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getActivity().getApplicationContext(), "stop", Toast.LENGTH_SHORT).show();
                     removeGeofence();
                 }
 
             }
         });
-
         return view;
     }
     protected synchronized void buildGoogleApiClient() {
@@ -146,6 +148,21 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
         }
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+        if(preferences.getString("APPSTATUS",null).equals("enter")) {
+            Snackbar snackbar;
+            if (preferences.getString("FLAG", null).equals("notallowed")) {
+                snackbar=Snackbar.make(getActivity().findViewById(R.id.linearlayoutmap), "Geofence services is already started", Snackbar.LENGTH_LONG);
+                snackbar.show();
+                menu.animate().translationYBy(snackbar.getView().getHeight());
+            }
+            else{
+                snackbar=Snackbar.make(getActivity().findViewById(R.id.linearlayoutmap), "Geofence services is not started", Snackbar.LENGTH_LONG);
+                snackbar.show();
+                menu.animate().translationYBy(snackbar.getView().getHeight());
+            }
+        }
+
     }
     @Override
     public void onStart() {
@@ -203,7 +220,7 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
     //Geofence Coding
     public void getGeofencesFromDatabase(){
         taskDetailsCloudEndPoint= FirebaseDatabase.getInstance().getReference().child("Users");
-        Toast.makeText(getActivity().getApplicationContext(),"Getting data",Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getActivity().getApplicationContext(),"Getting data",Toast.LENGTH_SHORT).show();
 
         taskDetailsCloudEndPoint.child(new CurrentUserData(getActivity().getBaseContext()).getCurrentUID()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -225,7 +242,7 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
                     //adding id i.e.place name for removing Geofences
                     ids.add(place_n);
                 }
-                Toast.makeText(getActivity().getApplicationContext(),"Started populating", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity().getApplicationContext(),"Started populating", Toast.LENGTH_SHORT).show();
                 populateGeofences();
 
             }
@@ -299,7 +316,7 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
         }
         try {
             if (preferences.getString("FLAG", null).equals("allowed")) {
-                Toast.makeText(getActivity().getApplicationContext(), "adding geofence", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity().getApplicationContext(), "adding geofence", Toast.LENGTH_SHORT).show();
                 LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, getGeofencingRequest(), getGeofencePendingIntent())
                         .setResultCallback(new ResultCallback<Status>() {
                             @Override
@@ -308,6 +325,7 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
                                     SharedPreferences.Editor editor = preferences.edit();
                                     editor.putString("FLAG", "notallowed");
                                     editor.commit();
+                                    Log.i("FLAG","not allowed");
                                     for (Map.Entry<String, LatLng> entry : LANDMARKS.entrySet()) {
                                         addMarker(entry.getKey(),new LatLng(entry.getValue().latitude, entry.getValue().longitude));
                                     }
@@ -315,7 +333,7 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
                                 }
                                 else {
                                     //request high frequency permission
-                                    Toast.makeText(getActivity().getApplicationContext(), "Geofences cannot be Added", Toast.LENGTH_SHORT).show();
+                                    //Toast.makeText(getActivity().getApplicationContext(), "Geofences cannot be Added", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
@@ -348,6 +366,7 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putString("FLAG", "allowed");
                     editor.commit();
+                    Log.i("FLAG","allowed");
                     Toast.makeText(getActivity().getApplicationContext(),"geofence found sucessfully removed",Toast.LENGTH_SHORT).show();
                     populateGeofences();
                     mMap.clear();
