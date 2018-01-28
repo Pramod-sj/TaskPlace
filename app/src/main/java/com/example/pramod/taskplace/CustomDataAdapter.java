@@ -58,9 +58,9 @@ public class CustomDataAdapter extends BaseAdapter {
 
             LayoutInflater inflater = LayoutInflater.from(context);
             convertView = inflater.inflate(R.layout.listitem, parent, false);
-            viewHolder.content_textView = (TextView) convertView.findViewById(R.id.contentData);
-            viewHolder.date_textView = (TextView) convertView.findViewById(R.id.timeData);
-            viewHolder.place_textView = (TextView) convertView.findViewById(R.id.placeData);
+            viewHolder.content_textView = convertView.findViewById(R.id.contentData);
+            viewHolder.date_textView = convertView.findViewById(R.id.timeData);
+            viewHolder.place_textView = convertView.findViewById(R.id.placeData);
             result=convertView;
             convertView.setTag(viewHolder);
         } else {

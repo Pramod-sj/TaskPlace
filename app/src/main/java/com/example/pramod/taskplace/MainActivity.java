@@ -41,6 +41,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -85,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setVerticalScrollBarEnabled(false);
         header=navigationView.getHeaderView(0);
         circleImageView=(CircleImageView) header.findViewById(R.id.imageView);
         circleImageView.setClickable(true);
@@ -188,7 +190,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.devOption) {
+        if (id == R.id.settingOption) {
+            Intent i=new Intent(MainActivity.this,SettingsActivity.class);
+            startActivity(i);
+            return true;
+        }
+        else if (id == R.id.devOption) {
             Intent i=new Intent(MainActivity.this,DevPage.class);
             startActivity(i);
             return true;
@@ -198,6 +205,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(i);
             return true;
         }
+        else if(id==R.id.LibOption){
+            Intent i=new Intent(MainActivity.this,OpenLibraries_Activity.class);
+            startActivity(i);
+            return true;
+        }
+        else if(id==R.id.exitOption){
+            System.exit(0);
+            return true;
+        }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -221,16 +238,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Fragment fragment = null;
         if(id==R.id.map_nav){
             fragment=new MapFragment();
-        }
-        else if (id == R.id.set_navtask) {
+        }else if (id == R.id.set_navtask) {
             // Handle the camera action
             fragment=new SetTask();
-        } else if (id == R.id.view_navTask) {
+        }else if (id == R.id.view_navTask) {
             fragment=new ViewTask();
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
         }else if(id==R.id.nav_logout){
             FirebaseAuth.getInstance().signOut();
             new Handler().postDelayed(new Runnable() {
@@ -280,5 +292,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                     });
         }
+    }
+    private void clearCache(){
+        try{
+            File cacheDir= new File(getCacheDir().getParent());
+            if(cacheDir.isDirectory()&&cacheDir!=null){
+                cacheDir.delete();
+                Toast.makeText(getApplicationContext(),"Cache removed",Toast.LENGTH_SHORT).show();
+            }
+            else{
+                Toast.makeText(getApplicationContext(),"Cache doesnt exist",Toast.LENGTH_SHORT).show();
+            }
+            File cacheExternalDir=getApplicationContext().getExternalCacheDir();
+            if(cacheExternalDir.isDirectory() && cacheExternalDir!=null){
+                cacheExternalDir.delete();
+                Toast.makeText(getApplicationContext(),"E Cache exist",Toast.LENGTH_SHORT).show();
+
+            }
+            else {
+                Toast.makeText(getApplicationContext(),"E Cache doesnt exist",Toast.LENGTH_SHORT).show();
+
+            }
+        }
+        catch(Exception e){Toast.makeText(getApplicationContext(),"Error while deleting cache\n"+e,Toast.LENGTH_SHORT).show();}
     }
 }

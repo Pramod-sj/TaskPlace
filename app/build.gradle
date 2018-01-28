@@ -47,5 +47,7 @@ dependencies {
     compile 'de.hdodenhof:circleimageview:2.2.0'
     compile 'com.github.clans:fab:1.6.4'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.stephentuso:welcome:1.4.1'
+    compile 'cat.ereza:customactivityoncrash:2.2.0'
 }
 apply plugin: 'com.google.gms.google-services'

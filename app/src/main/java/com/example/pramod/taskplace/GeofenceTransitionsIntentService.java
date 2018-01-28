@@ -8,10 +8,13 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.preference.RingtonePreference;
 import android.support.annotation.AnimRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -41,6 +44,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -95,11 +99,12 @@ public class GeofenceTransitionsIntentService extends JobIntentService implement
         //getGeofencesFromDatabase();
         Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
         notificationIntent.putExtra("NotifyPage", "ViewTask");
-        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         // Get a PendingIntent containing the entire back stack.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addParentStack(MainActivity.class).addNextIntent(notificationIntent);
         PendingIntent notificationPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        SharedPreferences preferences= PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String u=preferences.getString("notifications_new_message_ringtone",null);
         // Get a notification builder that's compatible with platform versions >= 4
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         // Define the notification settings.
@@ -109,11 +114,12 @@ public class GeofenceTransitionsIntentService extends JobIntentService implement
                 .setContentText("Click to setup your task.... ;)")
                 .setContentIntent(notificationPendingIntent)
                 .setAutoCancel(true)
-                .setSound(uri)
-                .setVibrate(new long[]{150, 300, 150, 400});
+                .setSound(Uri.parse(u));
         // Fire and notify the built Notification.
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if(preferences.getBoolean("notifications_new_message_vibrate",false)==true){
+            builder1.setVibrate(new long[]{150, 300, 150, 400});
+        }
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(0, builder.build());
     }
     /*public void getGeofencesFromDatabase(){

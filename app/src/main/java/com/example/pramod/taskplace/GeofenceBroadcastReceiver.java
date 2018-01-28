@@ -109,10 +109,10 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver implements Goog
                         .addOnConnectionFailedListener(this)
                         .addApi(LocationServices.API)
                         .build();
-
-
-                mGoogleApiClient.connect();
-                getGeofencesFromDatabase();
+                if(preferences.getString("FLAG",null).equals("notallowed")) {
+                    mGoogleApiClient.connect();
+                    getGeofencesFromDatabase();
+                }
                 //We got our GPS stuff up, add our geofences!
             }
         }
@@ -139,9 +139,10 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver implements Goog
                     .addApi(LocationServices.API)
                     .build();
 
-
-            mGoogleApiClient.connect();
-            getGeofencesFromDatabase();
+            if(preferences.getString("FLAG",null).equals("notallowed")) {
+                mGoogleApiClient.connect();
+                getGeofencesFromDatabase();
+            }
 
         }
         else{
@@ -199,6 +200,7 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver implements Goog
         } catch (Exception e) {
         }
         Log.i("Populated", "Populated");
+        GeofenceMethods geofenceMethods=new GeofenceMethods(contextBootReceiver,mGoogleApiClient,LANDMARKS,mGeofenceList);
         startGeofences();
     }
 

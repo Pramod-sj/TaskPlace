@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/settingOption"
+        android:orderInCategory="100"
+        android:title="@string/settingOption"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/aboutapp"
         android:orderInCategory="100"
         android:title="@string/aboutapp"
@@ -10,5 +15,17 @@
         android:id="@+id/devOption"
         android:orderInCategory="100"
         android:title="@string/devOption"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/LibOption"
+        android:orderInCategory="100"
+        android:title="@string/LibOption"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/exitOption"
+        android:orderInCategory="100"
+        android:title="@string/exitOption"
         app:showAsAction="never" />
 </menu>

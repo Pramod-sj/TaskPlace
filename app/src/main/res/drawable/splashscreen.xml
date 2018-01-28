@@ -15,6 +15,6 @@
         android:height="170dp"
         android:width="170dp">
         <bitmap
-            android:src="@drawable/splash"/>
+            android:src="@drawable/tasksvg"/>
     </item>
 </layer-list>

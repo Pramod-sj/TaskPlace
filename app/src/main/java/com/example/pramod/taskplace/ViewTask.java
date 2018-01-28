@@ -24,7 +24,10 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
@@ -39,10 +42,11 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class ViewTask extends Fragment {
+public class ViewTask extends Fragment{
     View view;
     CurrentUserData currentUserData;
     DatabaseReference taskDetailsCloudEndPoint;
+    GoogleApiClient mGoogleApiClient;
     //array for viewing purpose
     ArrayList<String> contents=new ArrayList<String>();
     ArrayList<String> dates=new ArrayList<String>();
@@ -51,6 +55,7 @@ public class ViewTask extends Fragment {
     ListView listView;
     LinearLayout container;
     ArrayList<TaskDetails> data;
+    ArrayList<String> ids=new ArrayList<String>();
     //ArrayAdapter<String> arrayAdapter;
     CustomDataAdapter adapter;
     PlaceAutocompleteFragment placeAutocompleteFragment;
@@ -64,6 +69,7 @@ public class ViewTask extends Fragment {
         taskDetailsCloudEndPoint= FirebaseDatabase.getInstance().getReference().child("Users");
         //returning our layout file
         //change R.layout.yourlayoutfilename for each of your fragments
+
         fetchData();
         container = view.findViewById(R.id.ll);
         listView=view.findViewById(R.id.listView);
@@ -85,6 +91,7 @@ public class ViewTask extends Fragment {
 
                                 //}
                                 removeTask(data.get(index).taskid);
+                                ids.add(data.get(index).getPlace());
                             }
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -100,10 +107,39 @@ public class ViewTask extends Fragment {
 
             }
         });
-
-
-
+        buildGoogleApiClient();
         return view;
+    }
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity().getApplicationContext())
+                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                    @Override
+                    public void onConnected(@Nullable Bundle bundle) {
+
+                    }
+
+                    @Override
+                    public void onConnectionSuspended(int i) {
+
+                    }
+                })
+                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+                    }
+                })
+                .addApi(LocationServices.API)
+                .build();
+    }
+    public void onResume(){
+        super.onResume();
+        mGoogleApiClient.connect();
+    }
+
+    public void onStop() {
+        super.onStop();
+        mGoogleApiClient.disconnect();
     }
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -138,6 +174,7 @@ public class ViewTask extends Fragment {
                     d.setContent(content);
                     d.setTaskdate(date);
                     data.add(d);
+                    ids.add(place_n);
                 }
 
                 if(!contents.isEmpty()||!dates.isEmpty()||!places.isEmpty()){
@@ -172,6 +209,8 @@ public class ViewTask extends Fragment {
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()){
                     Snackbar.make(getActivity().findViewById(R.id.ll),"Successfully removed",Snackbar.LENGTH_SHORT).show();
+                    GeofenceMethods geofenceMethods=new GeofenceMethods(getActivity(),mGoogleApiClient);
+                    geofenceMethods.removeGeofence(ids);
                 }
                 else {
                     Snackbar.make(getActivity().findViewById(R.id.ll), "Unable to remove", Snackbar.LENGTH_SHORT).show();

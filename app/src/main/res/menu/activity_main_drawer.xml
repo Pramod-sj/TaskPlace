@@ -17,19 +17,20 @@
             android:icon="@drawable/ic_viewtask_black_24dp"
             android:title="View Task" />
     </group>
-
-    <item android:title="Communicate">
+<!--
+    <item android:title="App Specific">
         <menu>
             <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
+                android:id="@+id/nav_setting"
+                android:icon="@drawable/ic_settings_black_24dp"
+                android:title="Setting" />
+
             <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+                android:id="@+id/nav_about"
+                android:icon="@drawable/ic_info_black_24dp"
+                android:title="About" />
         </menu>
-    </item>
+    </item>-->
     <item android:title="Account">
         <menu>
             <item

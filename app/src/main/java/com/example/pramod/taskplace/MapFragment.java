@@ -1,8 +1,10 @@
 package com.example.pramod.taskplace;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -10,6 +12,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -77,10 +80,18 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
     DatabaseReference taskDetailsCloudEndPoint;
     SharedPreferences preferences;
     FloatingActionMenu menu;
+    Context context;
+    GeofenceMethods geofenceMethods;
     com.github.clans.fab.FloatingActionButton fab1,fab2;
-
+    @SuppressLint("ValidFragment")
+    public MapFragment(Context context,ArrayList<String> ids){
+        this.context=context;
+        this.ids=ids;
+    }
+    public MapFragment(){}
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.activity_map_fragment, null, false);
+        context=getActivity().getApplicationContext();
         preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SupportMapFragment supportMapFragment = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map));
         supportMapFragment.getMapAsync(this);
@@ -93,8 +104,10 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
             @Override
             public void onClick(View view) {
                 if(dataCount!=0) {
+                    geofenceMethods=new GeofenceMethods(context,mGoogleApiClient,mMap,LANDMARKS,mGeofenceList);
+
                     //Toast.makeText(getActivity().getApplicationContext(), "started", Toast.LENGTH_SHORT).show();
-                    startGeofences();
+                    geofenceMethods.startGeofences();
                 }
                 else{
                     Snackbar s=Snackbar.make(getActivity().findViewById(R.id.linearlayoutmap),"Please set some task",Snackbar.LENGTH_SHORT);
@@ -115,10 +128,11 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
             @Override
             public void onClick(View view) {
                 if(dataCount!=0) {
-                    //Toast.makeText(getActivity().getApplicationContext(), "stop", Toast.LENGTH_SHORT).show();
-                    removeGeofence();
-                }
+                    geofenceMethods=new GeofenceMethods(context,mGoogleApiClient,mMap,LANDMARKS,mGeofenceList);
 
+                    //Toast.makeText(getActivity().getApplicationContext(), "stop", Toast.LENGTH_SHORT).show();
+                    geofenceMethods.removeGeofence(ids);
+                }
             }
         });
         return view;
@@ -153,13 +167,10 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
             Snackbar snackbar;
             if (preferences.getString("FLAG", null).equals("notallowed")) {
                 snackbar=Snackbar.make(getActivity().findViewById(R.id.linearlayoutmap), "Geofence services is already started", Snackbar.LENGTH_LONG);
-                snackbar.show();
-                menu.animate().translationYBy(snackbar.getView().getHeight());
-            }
+                snackbar.show();}
             else{
                 snackbar=Snackbar.make(getActivity().findViewById(R.id.linearlayoutmap), "Geofence services is not started", Snackbar.LENGTH_LONG);
                 snackbar.show();
-                menu.animate().translationYBy(snackbar.getView().getHeight());
             }
         }
 
@@ -278,19 +289,6 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
         catch (Exception e){}
         Toast.makeText(getActivity().getApplicationContext(),"Populated",Toast.LENGTH_SHORT).show();
     }
-    private GeofencingRequest getGeofencingRequest() {
-        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
-        builder.addGeofences(mGeofenceList);
-        return builder.build();
-    }
-    private PendingIntent getGeofencePendingIntent() {
-        Intent intent = new Intent(getActivity(), GeofenceTransitionsIntentService.class);
-        // We use FLAG_UPDATE_CURRENT so that we get the
-        //same pending intent back when calling addgeoFences()
-        return PendingIntent.getService(getActivity(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-    }
-
     @Override
     public void onDestroy(){
         super.onDestroy();
@@ -303,80 +301,6 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
     public void onPause(){
         super.onPause();
         mMap.clear();
-    }
-    public void startGeofences() {
-        if (!mGoogleApiClient.isConnected()) {
-            Toast.makeText(getActivity().getApplicationContext(), "Google API Client not connected!", Toast.LENGTH_SHORT).show();
-            mGoogleApiClient.connect();
-            return;
-        }
-        if(!checkPermissions()){
-            Snackbar.make(getActivity().findViewById(R.id.linearlayoutmap),"Permission Required",Snackbar.LENGTH_SHORT).show();
-            return;
-        }
-        try {
-            if (preferences.getString("FLAG", null).equals("allowed")) {
-                //Toast.makeText(getActivity().getApplicationContext(), "adding geofence", Toast.LENGTH_SHORT).show();
-                LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, getGeofencingRequest(), getGeofencePendingIntent())
-                        .setResultCallback(new ResultCallback<Status>() {
-                            @Override
-                            public void onResult(@NonNull Status status) {
-                                if (status.isSuccess()) {
-                                    SharedPreferences.Editor editor = preferences.edit();
-                                    editor.putString("FLAG", "notallowed");
-                                    editor.commit();
-                                    Log.i("FLAG","not allowed");
-                                    for (Map.Entry<String, LatLng> entry : LANDMARKS.entrySet()) {
-                                        addMarker(entry.getKey(),new LatLng(entry.getValue().latitude, entry.getValue().longitude));
-                                    }
-                                    // Result processed in onResult().
-                                }
-                                else {
-                                    //request high frequency permission
-                                    //Toast.makeText(getActivity().getApplicationContext(), "Geofences cannot be Added", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
-            }
-
-
-        }
-        catch(SecurityException securityException){
-            // Catch exception generated if the app does not use ACCESS_FINE_LOCATION permission.
-        }
-
-    }
-    public void removeGeofence(){
-        if (!mGoogleApiClient.isConnected()) {
-            Toast.makeText(getActivity().getApplicationContext(), "Google API Client not connected!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if(!checkPermissions()){
-            Snackbar.make(getActivity().findViewById(R.id.linearlayoutmap),"Permission Required",Snackbar.LENGTH_SHORT).show();
-            return;
-        }
-        if(ids.isEmpty()){
-            Toast.makeText(getActivity().getApplicationContext(),"Cannot remove no geofence found",Toast.LENGTH_SHORT).show();
-            return;
-        }
-        LocationServices.GeofencingApi.removeGeofences(mGoogleApiClient,ids).setResultCallback(new ResultCallback<Status>() {
-            @Override
-            public void onResult(@NonNull Status status) {
-                if(status.isSuccess()){
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString("FLAG", "allowed");
-                    editor.commit();
-                    Log.i("FLAG","allowed");
-                    Toast.makeText(getActivity().getApplicationContext(),"geofence found sucessfully removed",Toast.LENGTH_SHORT).show();
-                    populateGeofences();
-                    mMap.clear();
-                }
-                else{
-                    Toast.makeText(getActivity().getApplicationContext(),"Cannot remove geofence",Toast.LENGTH_SHORT).show();
-
-                }
-            }
-        });
     }
     /**
      * Return the current state of the permissions needed.
