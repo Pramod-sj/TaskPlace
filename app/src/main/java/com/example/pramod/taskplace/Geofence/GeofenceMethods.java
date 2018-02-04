@@ -1,30 +1,31 @@
-package com.example.pramod.taskplace;
+package com.example.pramod.taskplace.Geofence;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.pramod.taskplace.Database.DatabaseHelper;
+import com.example.pramod.taskplace.LocationService.LocationRequestHelper;
+import com.example.pramod.taskplace.Activities.MainActivity;
+import com.example.pramod.taskplace.R;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,35 +36,21 @@ import java.util.Map;
  */
 
 public class GeofenceMethods {
+    NotificationManager notificationManager;
     Context context;
     GoogleApiClient mGoogleApiClient;
     SharedPreferences preferences;
     SharedPreferences.Editor editor;
-    GoogleMap mMap;
     ArrayList<Geofence> mGeofenceList=new ArrayList<Geofence>();
-    String map;
     public HashMap<String, LatLng> LANDMARKS = new HashMap<String, LatLng>();
-    GeofenceMethods(Context context,GoogleApiClient mGoogleApiClient){
+    public GeofenceMethods(Context context,GoogleApiClient mGoogleApiClient){
         this.context=context;
-        map="";
         this.mGoogleApiClient=mGoogleApiClient;
     }
-    GeofenceMethods(Context context, GoogleApiClient mGoogleApiClient,GoogleMap mMap,HashMap<String,LatLng> LANDMARKS,ArrayList<Geofence> mGeofenceList){
+    public GeofenceMethods(Context context, GoogleApiClient mGoogleApiClient,HashMap<String,LatLng> LANDMARKS){
         this.context=context;
         this.mGoogleApiClient=mGoogleApiClient;
-        this.mGeofenceList=mGeofenceList;
-        this.mMap=mMap;
-        map="map";
         this.LANDMARKS=LANDMARKS;
-        preferences= PreferenceManager.getDefaultSharedPreferences(context);
-        editor=preferences.edit();
-    }
-    GeofenceMethods(Context context, GoogleApiClient mGoogleApiClient,HashMap<String,LatLng> LANDMARKS,ArrayList<Geofence> mGeofenceList){
-        this.context=context;
-        this.mGeofenceList=mGeofenceList;
-        this.mGoogleApiClient=mGoogleApiClient;
-        this.LANDMARKS=LANDMARKS;
-        map="";
         preferences= PreferenceManager.getDefaultSharedPreferences(context);
         editor=preferences.edit();
     }
@@ -73,23 +60,16 @@ public class GeofenceMethods {
             return;
         }
         try {
-            if (preferences.getString("FLAG", null).equals("allowed")) {
-                //Toast.makeText(getActivity().getApplicationContext(), "adding geofence", Toast.LENGTH_SHORT).show();
-                LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, getGeofencingRequest(mGeofenceList), getGeofencePendingIntent())
-                        .setResultCallback(new ResultCallback<Status>() {
+            //Toast.makeText(getActivity().getApplicationContext(), "adding geofence", Toast.LENGTH_SHORT).show();
+            LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, getGeofencingRequest(mGeofenceList), getGeofencePendingIntent())
+                    .setResultCallback(new ResultCallback<Status>() {
                             @Override
                             public void onResult(@NonNull Status status) {
                                 if (status.isSuccess()) {
-                                    SharedPreferences.Editor editor = preferences.edit();
-                                    editor.putString("FLAG", "notallowed");
-                                    editor.commit();
-                                    Log.i("FLAG","not allowed");
-                                    if(map.equals("map")) {
-                                        for (Map.Entry<String, LatLng> entry : LANDMARKS.entrySet()) {
-                                            addMarker(entry.getKey(), new LatLng(entry.getValue().latitude, entry.getValue().longitude));
-                                        }
-                                    }
-                                    // Result processed in onResult().
+                                    LocationRequestHelper.setRequesting(context,false);
+                                    GeofenceRequestHelper.setGeoReuesting(context,false);
+                                    showOrHideNotification();
+                                    Log.i("ADDED GEOFENCE",String.valueOf(GeofenceRequestHelper.getGeoReuesting(context)));
                                 }
                                 else {
                                     //request high frequency permission
@@ -97,8 +77,6 @@ public class GeofenceMethods {
                                 }
                             }
                         });
-            }
-
 
         }
         catch(SecurityException securityException){
@@ -114,60 +92,37 @@ public class GeofenceMethods {
     }
     private PendingIntent getGeofencePendingIntent() {
         Intent intent = new Intent(context, GeofenceTransitionsIntentService.class);
-        // We use FLAG_UPDATE_CURRENT so that we get the
-        //same pending intent back when calling addgeoFences()
         return PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    public void removeGeofence(ArrayList<String> ids){
-
+    public void removeGeofence(final ArrayList<String> ids){
         if (!mGoogleApiClient.isConnected()) {
             Toast.makeText(context, "Google API Client not connected!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        //if(!checkPermissions()){
-        //    Snackbar.make(getActivity().findViewById(R.id.linearlayoutmap),"Permission Required",Snackbar.LENGTH_SHORT).show();
-        //    return;
-        //}
-        if(ids.isEmpty()){
-            Toast.makeText(context,"Cannot remove no geofence found",Toast.LENGTH_SHORT).show();
             return;
         }
         LocationServices.GeofencingApi.removeGeofences(mGoogleApiClient,ids).setResultCallback(new ResultCallback<Status>() {
             @Override
             public void onResult(@NonNull Status status) {
                 if(status.isSuccess()){
-                    SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(context);
+                    /*SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(context);
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putString("FLAG", "allowed");
                     editor.commit();
                     Log.i("FLAG","allowed");
-
-                    Log.i("Geofence","successfully geofence removed");
-                    //populateGeofences();
-                    if(map.equals("map")) {
-                        mMap.clear();
-                    }
+                    Log.i("Geofence","successfully geofence removed");*/
+                    GeofenceRequestHelper.setGeoReuesting(context,true);//true so that geofence can be added
+                    LocationRequestHelper.setRequesting(context,true);
+                    showOrHideNotification();
+                    Log.i("REMOVED GEOFENCE",String.valueOf(GeofenceRequestHelper.getGeoReuesting(context)));
                 }
                 else{
-                    Log.i("Geofence","Cannot remove geofence");
+                    Log.i("REMOVE GEOFENCE","CANNOT REMOVE GEOFENCE");
 
                 }
             }
         });
     }
-    private void addMarker(String key, LatLng latLng) {
-        mMap.addMarker(new MarkerOptions()
-                .title("G:" + key)
-                .position(latLng));
-        mMap.addCircle(new CircleOptions()
-                .center(latLng)
-                .radius(100.0f)
-                .strokeColor(Color.argb(50, 70,70,70))
-                .fillColor(Color.argb(80, 150,150,150)));
-    }
-
-    /*public void populateGeofences() {
+    public void populateGeofences() {
         mGeofenceList=new ArrayList<Geofence>();
         if(!mGeofenceList.isEmpty()){
             mGeofenceList.clear();
@@ -181,16 +136,50 @@ public class GeofenceMethods {
                         .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                         .build());
             }
-            Log.i("FLAG",preferences.getString("FLAG",null));
-            if(preferences.getString("FLAG", null).equals("notallowed")){
-                for (Map.Entry<String, LatLng> entry : LANDMARKS.entrySet()) {
-                    addMarker(entry.getKey(),new LatLng(entry.getValue().latitude, entry.getValue().longitude));
-                }
-            }
         }
-        catch (Exception e){}
-        Toast.makeText(getActivity().getApplicationContext(),"Populated",Toast.LENGTH_SHORT).show();
-    }*/
+        catch (Exception e){Log.i("ERROR WHILE POPULATING",String.valueOf(e));}
+        startGeofences();
+
+    }
 
 
+
+    void showOrHideNotification() {
+        Intent notificationIntent = new Intent(context, MainActivity.class);
+        // Construct a task stack.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        // Add the main Activity to the task stack as the parent.
+        stackBuilder.addParentStack(MainActivity.class);
+        // Push the content Intent onto the stack.
+        stackBuilder.addNextIntent(notificationIntent);
+        // Get a PendingIntent containing the entire back stack.
+        PendingIntent notificationPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        Notification notification = new NotificationCompat.Builder(context)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("TaskPlace")
+                .setContentText("Service is active")
+                .setAutoCancel(false)
+
+                .setOngoing(true)
+                .setContentIntent(notificationPendingIntent)
+                .build();
+        notificationManager= (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if(GeofenceRequestHelper.getGeoReuesting(context)==true){
+            notificationManager.cancel(0);
+        }else{
+            notificationManager.notify(0,notification);
+        }
+    }
+
+
+    public void removeallgeofences(){
+        ArrayList<String> places=new ArrayList<>();
+        DatabaseHelper db=new DatabaseHelper(context);
+        SQLiteDatabase sql=db.getReadableDatabase();
+        Cursor cursor=sql.rawQuery("select * from TaskPlace",null);
+        while (cursor.moveToNext()){
+            places.add(cursor.getString(2));
+        }
+        removeGeofence(places);
+    }
 }

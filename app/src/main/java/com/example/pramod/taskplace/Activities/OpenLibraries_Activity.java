@@ -1,4 +1,4 @@
-package com.example.pramod.taskplace;
+package com.example.pramod.taskplace.Activities;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -7,8 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Switch;
-import android.widget.Toast;
+
+import com.example.pramod.taskplace.Adapters.OpenLibrariesAdapter;
+import com.example.pramod.taskplace.R;
 
 /**
  * Created by pramod on 26/1/18.

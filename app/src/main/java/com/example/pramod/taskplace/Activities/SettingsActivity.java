@@ -1,28 +1,17 @@
-package com.example.pramod.taskplace;
+package com.example.pramod.taskplace.Activities;
 
-import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.support.v7.app.ActionBar;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
-import android.text.TextUtils;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import java.io.File;
-import java.util.List;
+import com.example.pramod.taskplace.Activities.MainActivity;
+import com.example.pramod.taskplace.AppCompatPreferenceActivity;
+import com.example.pramod.taskplace.R;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On

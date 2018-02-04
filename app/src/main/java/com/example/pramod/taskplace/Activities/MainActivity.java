@@ -1,20 +1,19 @@
-package com.example.pramod.taskplace;
+package com.example.pramod.taskplace.Activities;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.HandlerThread;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
@@ -26,14 +25,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
+import com.example.pramod.taskplace.CurrentUserData;
+import com.example.pramod.taskplace.Database.DatabaseHelper;
+import com.example.pramod.taskplace.Geofence.GeofenceMethods;
+import com.example.pramod.taskplace.R;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
@@ -44,7 +55,6 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -54,9 +64,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     Uri ImagePATH;
     final int SELECT_PHOTO=100;
     AlertDialog alertDialog;
+    GoogleApiClient mGoogleApiClient;
     //Firebase
     FirebaseStorage storage;
     StorageReference storageReference;
+    private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
 
     SharedPreferences preferences;
     SharedPreferences.Editor editor;
@@ -66,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         storage=FirebaseStorage.getInstance();
         storageReference = storage.getReference();
+        buildGoogleApiClient();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         TextView username,useremail;
@@ -143,6 +156,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             });
         }
 
+        if(!checkPermissions()){
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_PERMISSIONS_REQUEST_CODE);
+        }
+    }
+
+    private boolean checkPermissions() {
+        int permissionState = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION);
+        return permissionState == PackageManager.PERMISSION_GRANTED;
+    }
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(MainActivity.this)
+                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                    @Override
+                    public void onConnected(@Nullable Bundle bundle) {
+
+                    }
+
+                    @Override
+                    public void onConnectionSuspended(int i) {
+
+                    }
+                })
+                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+                    }
+                })
+                .addApi(LocationServices.API)
+                .build();
+    }
+    protected void onResume(){
+        super.onResume();
+        locationPermissionChecker(mGoogleApiClient,MainActivity.this);
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mGoogleApiClient.disconnect();
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
@@ -196,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return true;
         }
         else if (id == R.id.devOption) {
-            Intent i=new Intent(MainActivity.this,DevPage.class);
+            Intent i=new Intent(MainActivity.this,DevPageActivity.class);
             startActivity(i);
             return true;
         }
@@ -236,15 +294,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
     public void navItem(int id){
         Fragment fragment = null;
-        if(id==R.id.map_nav){
-            fragment=new MapFragment();
-        }else if (id == R.id.set_navtask) {
+        if (id == R.id.set_navtask) {
             // Handle the camera action
             fragment=new SetTask();
         }else if (id == R.id.view_navTask) {
             fragment=new ViewTask();
         }else if(id==R.id.nav_logout){
             FirebaseAuth.getInstance().signOut();
+            DatabaseHelper db=new DatabaseHelper(MainActivity.this);
+            db.removeAlldata();
+            GeofenceMethods geofenceMethods=new GeofenceMethods(MainActivity.this,mGoogleApiClient);
+            geofenceMethods.removeallgeofences();
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -316,4 +376,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         catch(Exception e){Toast.makeText(getApplicationContext(),"Error while deleting cache\n"+e,Toast.LENGTH_SHORT).show();}
     }
+
+    public static void locationPermissionChecker(GoogleApiClient mGoogleApiClient, final Activity activity) {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(30 * 1000);
+        locationRequest.setFastestInterval(5 * 1000);
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest);
+        builder.setAlwaysShow(true);
+        PendingResult<LocationSettingsResult> result =
+                LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+            @Override
+            public void onResult(LocationSettingsResult result) {
+                final Status status = result.getStatus();
+                final LocationSettingsStates state = result.getLocationSettingsStates();
+                switch (status.getStatusCode()) {
+                    case LocationSettingsStatusCodes.SUCCESS:
+                        // All location settings are satisfied. The client can initialize location
+                        // requests here.
+                        break;
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        // Location settings are not satisfied. But could be fixed by showing the user
+                        // a dialog.
+                        try {
+                            // Show the dialog by calling startResolutionForResult(),
+                            // and check the result in onActivityResult().
+                            status.startResolutionForResult(
+                                    activity, 1000);
+                        } catch (Exception e) {
+                            // Ignore the error.
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        // Location settings are not satisfied. However, we have no way to fix the
+                        // settings so we won't show the dialog.
+                        break;
+                }
+            }
+        });
+    }
+
+
+
+
+
 }

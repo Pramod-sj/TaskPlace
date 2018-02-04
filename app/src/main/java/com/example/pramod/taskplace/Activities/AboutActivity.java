@@ -1,11 +1,12 @@
-package com.example.pramod.taskplace;
+package com.example.pramod.taskplace.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.widget.Toolbar;
+
+import com.example.pramod.taskplace.R;
 
 /**
  * Created by pramod on 24/1/18.

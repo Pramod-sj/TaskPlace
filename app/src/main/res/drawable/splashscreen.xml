@@ -11,9 +11,7 @@
         </shape>
     </item>
     <item
-        android:gravity="center"
-        android:height="170dp"
-        android:width="170dp">
+        android:gravity="center">
         <bitmap
             android:src="@drawable/tasksvg"/>
     </item>

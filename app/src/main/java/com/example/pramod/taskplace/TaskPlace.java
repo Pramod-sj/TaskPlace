@@ -1,7 +1,11 @@
 package com.example.pramod.taskplace;
 
+import android.*;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Application;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
 import android.widget.Toast;
 
 import cat.ereza.customactivityoncrash.CustomActivityOnCrash;
@@ -11,7 +15,7 @@ import cat.ereza.customactivityoncrash.config.CaocConfig;
  * Created by pramod on 28/1/18.
  */
 
-public class ApplicationActivity extends Application {
+public class TaskPlace extends Application {
     @SuppressLint("RestrictedApi")
     public void onCreate(){
         super.onCreate();
@@ -30,6 +34,5 @@ public class ApplicationActivity extends Application {
                 .apply();
         CustomActivityOnCrash.install(this);
 
-        Toast.makeText(getApplicationContext(),"Executed application",Toast.LENGTH_SHORT).show();
     }
 }

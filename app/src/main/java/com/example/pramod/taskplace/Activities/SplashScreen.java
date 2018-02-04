@@ -1,23 +1,20 @@
-package com.example.pramod.taskplace;
+package com.example.pramod.taskplace.Activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.stephentuso.welcome.WelcomeActivity;
+import com.example.pramod.taskplace.OnRecentClearService;
+import com.example.pramod.taskplace.R;
 import com.stephentuso.welcome.WelcomeHelper;
 
 /**

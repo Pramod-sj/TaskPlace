@@ -1,18 +1,14 @@
-package com.example.pramod.taskplace;
+package com.example.pramod.taskplace.Activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,16 +17,16 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.pramod.taskplace.CurrentUserData;
+import com.example.pramod.taskplace.Database.FirebaseDatabaseHelper;
+import com.example.pramod.taskplace.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthEmailException;
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
-import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.internal.FirebaseAppHelper;
 
 /**
  * Created by pramod on 11/1/18.
@@ -115,12 +111,15 @@ public class Login extends AppCompatActivity{
                                 CurrentUserData currentUserData=new CurrentUserData(Login.this);
                                 currentUserData.setCurrentUID(UID);
                                 currentUserData.setCurrentUserEmail(email_id);
-                                SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                                SharedPreferences.Editor editor = preferences.edit();
-                                editor.putString("FLAG", "allowed");
-                                editor.commit();
-                                Intent i = new Intent(Login.this, MainActivity.class);
-                                startActivity(i);
+                                FirebaseDatabaseHelper db=new FirebaseDatabaseHelper(Login.this);
+                                db.insertDataToOffline();
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Intent i = new Intent(Login.this, MainActivity.class);
+                                        startActivity(i);
+                                    }
+                                },1000);
                             }
                             else{
                                 Toast.makeText(getApplicationContext(),"Please verify yourself",Toast.LENGTH_SHORT).show();

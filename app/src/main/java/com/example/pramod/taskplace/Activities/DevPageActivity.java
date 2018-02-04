@@ -1,19 +1,19 @@
-package com.example.pramod.taskplace;
+package com.example.pramod.taskplace.Activities;
 
 import android.annotation.SuppressLint;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import java.util.ArrayList;
+import com.example.pramod.taskplace.Adapters.DevAdapter;
+import com.example.pramod.taskplace.R;
 
 /**
  * Created by pramod on 23/1/18.
  */
 
-public class DevPage extends AppCompatActivity{
+public class DevPageActivity extends AppCompatActivity{
     RecyclerView recyclerView;
     final String[] devemails={"pramodsinghjantwal@gmail.com","ashishkokane1605@gmail.com","abhishek.as208@gmail.com"};
     final String devnames[]={"Pramod SJ","Ashish K","Abhishek S"};
@@ -34,7 +34,7 @@ public class DevPage extends AppCompatActivity{
         //devnames=getResources().getStringArray(R.id.devName);
         LinearLayoutManager layoutManager=new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        DevCustomAdapter adapter=new DevCustomAdapter(this,devnames,devemails,devdp,devStatus);
+        DevAdapter adapter=new DevAdapter(this,devnames,devemails,devdp,devStatus);
         recyclerView.setAdapter(adapter);
     }
 }

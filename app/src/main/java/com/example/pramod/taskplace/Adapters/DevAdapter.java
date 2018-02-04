@@ -1,6 +1,5 @@
-package com.example.pramod.taskplace;
+package com.example.pramod.taskplace.Adapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -9,9 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.pramod.taskplace.R;
 import com.squareup.picasso.Picasso;
-
-import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -19,14 +17,14 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by pramod on 23/1/18.
  */
 
-public class DevCustomAdapter extends RecyclerView.Adapter<DevCustomAdapter.ViewHolder> {
+public class DevAdapter extends RecyclerView.Adapter<DevAdapter.ViewHolder> {
     String[] devnames;
     String[] devemails;
     String[] images;
     String[] devstatus;
     Context context;
 
-    public DevCustomAdapter(Context context,String[] devnames,String[] devemails,String[] images,String[] devstatus){
+    public DevAdapter(Context context, String[] devnames, String[] devemails, String[] images, String[] devstatus){
         this.context=context;
         this.devnames=devnames;
         this.devemails=devemails;
@@ -34,13 +32,13 @@ public class DevCustomAdapter extends RecyclerView.Adapter<DevCustomAdapter.View
         this.devstatus=devstatus;
     }
     @Override
-    public DevCustomAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public DevAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.developer_listitem, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(DevCustomAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(DevAdapter.ViewHolder holder, int position) {
         holder.name.setText(devnames[position]);
         holder.email.setText(devemails[position]);
         holder.devStatus.setText(devstatus[position]);

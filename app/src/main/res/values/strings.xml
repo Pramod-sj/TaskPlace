@@ -101,4 +101,21 @@
     <string name="unknown_exception">Unknown exception</string>
     <string name="restart_app">Restart app</string>
     <string name="close_app">Close app</string>
+
+
+
+    <!--background location-->
+    <string name="request_updates">Request updates</string>
+    <string name="remove_updates">Remove updates</string>
+    <string name="unknown_location">Unknown location</string>
+
+    <string name="batched_location_updates">Batched location updates</string>
+
+    <plurals name="num_locations_reported">
+        <item quantity="zero">No location reported</item>
+        <item quantity="one">One location reported</item>
+        <item quantity="other">%d locations reported</item>
+    </plurals>
+
+    <string name="default_channel">Default channel</string>
 </resources>

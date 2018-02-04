@@ -1,4 +1,4 @@
-package com.example.pramod.taskplace;
+package com.example.pramod.taskplace.Adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.example.pramod.taskplace.R;
 
 /**
  * Created by pramod on 26/1/18.
@@ -15,7 +17,7 @@ public class OpenLibrariesAdapter extends BaseAdapter {
     String[] libName;
     String[] libDesc;
     Context context;
-    OpenLibrariesAdapter(Context context,String[] libName,String[] linDesc){
+    public OpenLibrariesAdapter(Context context,String[] libName,String[] linDesc){
         this.context=context;
         this.libName=libName;
         this.libDesc=linDesc;

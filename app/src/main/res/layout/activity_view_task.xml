@@ -10,6 +10,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"/>-->
+    <Switch
+        android:layout_margin="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="15dp"
+        android:textSize="20dp"
+        android:id="@+id/taskActivator"
+        android:text="Make my task active"/>
     <ListView
         android:id="@+id/listView"
         android:layout_width="match_parent"
