@@ -6,12 +6,35 @@
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8sp"
+        android:padding="10sp"
         android:layout_margin="8sp">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="1"
+                android:orientation="horizontal"
+                android:layout_marginLeft="8sp"
+                android:layout_marginRight="8sp"
+                android:layout_marginTop="8sp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Task Title :"
+                    android:textColor="#000000"
+                    android:layout_weight="0.30"
+                    android:textSize="20sp"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/contentData"
+                    android:textColor="#727272"
+                    android:layout_weight="0.80"
+                    android:textSize="20sp"/>
+            </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -33,29 +56,8 @@
                     android:id="@+id/placeData"
                     android:textColor="#727272"
                     android:layout_weight="0.80"
-                    android:textSize="20sp"/>
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:weightSum="1"
-                android:orientation="horizontal"
-                android:layout_marginLeft="8sp"
-                android:layout_marginRight="8sp"
-                android:layout_marginTop="8sp">
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="Task  :"
-                    android:textColor="#000000"
-                    android:layout_weight="0.20"
-                    android:textSize="20sp"/>
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/contentData"
-                    android:textColor="#727272"
-                    android:layout_weight="0.80"
+                    android:maxLines="2"
+                    android:ellipsize="end"
                     android:textSize="20sp"/>
             </LinearLayout>
             <LinearLayout
@@ -81,7 +83,6 @@
                     android:layout_weight="0.80"
                     android:textSize="20sp"/>
             </LinearLayout>
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -25,7 +25,7 @@ public class Notificationpage extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        setContentView(R.layout.notificationpage);
+        setContentView(R.layout.activity_notificationpage);
         Bundle bundle = getIntent().getExtras();
         final String task_id = bundle.getString("task_id");
         t1 = findViewById(R.id.n_taskTitle);
@@ -39,7 +39,7 @@ public class Notificationpage extends AppCompatActivity {
         String query = "select * from PlaceDatabase";
         Cursor cursor = sql.rawQuery(query, null);
         while (cursor.moveToNext()) {
-            if (cursor.getString(2).equals(task_id)) {
+            if (cursor.getString(1).equals(task_id)) {
                 t1.setText(cursor.getString(3));
                 t2.setText(cursor.getString(4));
                 t3.setText(cursor.getString(2));

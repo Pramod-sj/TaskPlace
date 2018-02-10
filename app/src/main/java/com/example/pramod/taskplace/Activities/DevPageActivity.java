@@ -27,7 +27,7 @@ public class DevPageActivity extends AppCompatActivity{
     @SuppressLint("ResourceType")
     protected void onCreate(Bundle s){
         super.onCreate(s);
-        setContentView(R.layout.developer_page);
+        setContentView(R.layout.activity_developer_page);
         setTitle("Developers");
         recyclerView=findViewById(R.id.recyclerView);
         //devemails=getResources().getStringArray(R.id.devEmail);

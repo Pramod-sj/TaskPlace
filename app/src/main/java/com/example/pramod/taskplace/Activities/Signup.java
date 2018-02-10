@@ -3,6 +3,7 @@ package com.example.pramod.taskplace.Activities;
 /**
  * Created by pramod on 11/1/18.
  */
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
@@ -12,7 +13,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,17 +24,22 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 
+import es.dmoral.toasty.Toasty;
+
 public class Signup extends AppCompatActivity {
     FirebaseAuth auth;
     EditText email,password;
     Button signup;
     TextView itoLogin;
     TextInputLayout emailWrap,passWrap;
-    ProgressBar pg;
+    ProgressDialog progressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.registration);
+        progressDialog=new ProgressDialog(Signup.this);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        setContentView(R.layout.activity_signup);
         auth = FirebaseAuth.getInstance();
         itoLogin=findViewById(R.id.itologin);
         emailWrap=findViewById(R.id.emailWrapper);
@@ -44,7 +49,6 @@ public class Signup extends AppCompatActivity {
         email=findViewById(R.id.editText1);
         password=findViewById(R.id.editText2);
         signup=findViewById(R.id.button);
-        pg=findViewById(R.id.progressBar);
         itoLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -55,7 +59,8 @@ public class Signup extends AppCompatActivity {
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pg.setVisibility(View.VISIBLE);
+                progressDialog.setMessage("please wait......");
+                progressDialog.show();
                 String email_id=email.getText().toString();
                 String password_=password.getText().toString();
                 if(TextUtils.isEmpty(email_id)){
@@ -76,15 +81,15 @@ public class Signup extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (!task.isSuccessful()) {
                             if (task.getException() instanceof FirebaseAuthUserCollisionException) {
-                                Toast.makeText(getApplicationContext(), "User with this email already exist.", Toast.LENGTH_SHORT).show();
-                                pg.setVisibility(View.GONE);
+                                Toasty.warning(getApplicationContext(), "User with this email already exist.", Toast.LENGTH_SHORT).show();
+                                progressDialog.cancel();
                                 return;
                             }
                         } else {
                             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                             user.sendEmailVerification();
-                            pg.setVisibility(View.GONE);
-                            Toast.makeText(getApplicationContext(),"We have sent you an mail for verification",Toast.LENGTH_SHORT).show();
+                            progressDialog.cancel();
+                            Toasty.success(getApplicationContext(),"We have sent you an mail for verification",Toast.LENGTH_SHORT).show();
 
                         }
                     }

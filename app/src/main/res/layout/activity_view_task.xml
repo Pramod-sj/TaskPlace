@@ -1,28 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     android:id="@+id/ll"
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-    <!--<android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:scrollbars="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"/>-->
     <Switch
         android:layout_margin="8dp"
         android:layout_width="match_parent"
         android:layout_height="15dp"
         android:textSize="20dp"
         android:id="@+id/taskActivator"
+        android:visibility="gone"
         android:text="Make my task active"/>
     <ListView
         android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
-        android:divider="@null">
+        android:divider="@null"
+        android:visibility="gone">
     </ListView>
     <ProgressBar
         android:layout_width="wrap_content"

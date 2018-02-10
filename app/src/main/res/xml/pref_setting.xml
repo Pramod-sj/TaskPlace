@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:title="Notification Settings"
-        >
-    <SwitchPreference
-        android:title="Notification"
-        android:defaultValue="true"
-        android:key="notification"/>
+        android:title="Notification Settings">
     <RingtonePreference
         android:defaultValue="content://settings/system/notification_sound"
         android:key="notifications_new_message_ringtone"
@@ -17,5 +12,28 @@
         android:defaultValue="true"
         android:key="notifications_new_message_vibrate"
         android:title="@string/pref_title_vibrate" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Accuracy Setting">
+        <ListPreference
+            android:title="Radius"
+            android:summary="set radius in which you will recieve notification"
+            android:key="radius"
+            android:entries="@array/radiusMetre"
+            android:entryValues="@array/radius"
+            android:defaultValue="100"
+            />
+        <SwitchPreference
+            android:title="Battery Saving"
+            android:summary="Save some bettery but may lead to less acure notifications"
+            android:key="mode"
+            android:defaultValue="false"/>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="System">
+        <Preference
+            android:title="Clear Cache"
+            android:summary="lets clear some unwanted stuff"
+            android:key="cache"/>
     </PreferenceCategory>
 </PreferenceScreen>

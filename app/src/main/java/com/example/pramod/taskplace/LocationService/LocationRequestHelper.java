@@ -9,19 +9,19 @@ import android.preference.PreferenceManager;
 
 public class LocationRequestHelper {
 
-    public final static String KEY_LOCATION_UPDATES_REQUESTED = "location-updates-requested";
+    public final static String LOCATION_UPDATES_TRIGGER= "trigger";
     public final static String LOCATION_UPDATES = "location-updates";
-
-    public static void setRequesting(Context context, boolean value) {
+    public final static String NOTIFICATION_FLAG="noti_flag";
+    public static void setRequestingTrigger(Context context, boolean value) {
         PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
-                .putBoolean(KEY_LOCATION_UPDATES_REQUESTED, value)
+                .putBoolean(LOCATION_UPDATES_TRIGGER, value)
                 .apply();
     }
 
-    public static boolean getRequesting(Context context) {
+    public static boolean getRequestingTrigger(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context)
-                .getBoolean(KEY_LOCATION_UPDATES_REQUESTED, false);
+                .getBoolean(LOCATION_UPDATES_TRIGGER, true);
     }
 
     public static void setLocationRequesting(Context context, String value) {
@@ -34,5 +34,17 @@ public class LocationRequestHelper {
     public static String getLocationRequesting(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(LOCATION_UPDATES,"");
+    }
+
+    public static void setNotificationFlag(Context context, boolean value) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putBoolean(NOTIFICATION_FLAG,value)
+                .apply();
+    }
+
+    public static boolean getNotificationFlag(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(NOTIFICATION_FLAG,true);
     }
 }

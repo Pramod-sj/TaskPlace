@@ -16,15 +16,26 @@
 
 package com.example.pramod.taskplace.LocationService;
 
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.example.pramod.taskplace.TaskPlace;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 
 import java.util.List;
 
@@ -42,30 +53,44 @@ import java.util.List;
  *  foreground.
  */
 public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
+    GoogleApiClient mGoogleApiClient;
+    Context context;
     private static final String TAG = "LUBroadcastReceiver";
     public static final String ACTION_PROCESS_UPDATES = "com.example.pramod.taskplace.action" + ".PROCESS_UPDATES";
+    LocationRequest locationRequest;
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent != null) {
-            final String action = intent.getAction();
-            if (ACTION_PROCESS_UPDATES.equals(action)) {
-                LocationResult result = LocationResult.extractResult(intent);
-                if (result != null) {
-                    List<Location> locations = result.getLocations();
-                    //saving lat and lng to sharedpref LocationRequestHelper
-                    String latlng=locations.get(0).getLatitude()+":"+locations.get(0).getLongitude();
-                    LocationRequestHelper.setLocationRequesting(context,latlng);
-                    LocationResultHelper locationResultHelper = new LocationResultHelper(
-                            context, locations);
-                    // Save the location data to SharedPreferences.
-                    locationResultHelper.saveResults();
-                    // Show notification with the location data.
-                    //locationResultHelper.showNotification();
-                    Log.i(TAG, LocationResultHelper.getSavedLocationResult(context));
+        this.context=context;
+        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
+            if(LocationRequestHelper.getRequestingTrigger(context)==false) {
+                if (TaskPlace.getGoogleApiHelper().isConnected()) {
+                    mGoogleApiClient = TaskPlace.getGoogleApiHelper().getGoogleApiClient();
+                    Toast.makeText(context, String.valueOf(TaskPlace.getGoogleApiHelper().getGoogleApiClient().isConnected()), Toast.LENGTH_SHORT).show();
                 }
+                Toast.makeText(context, "no api client", Toast.LENGTH_SHORT).show();
+                LocationServiceMethods methods = new LocationServiceMethods(context, mGoogleApiClient);
+                methods.createLocationRequest();
+                methods.requestLocationUpdates();
             }
         }
+        if (intent.getAction().equals(ACTION_PROCESS_UPDATES)) {
+            Log.i("hello","bro");
+            LocationResult result = LocationResult.extractResult(intent);
+            if (result == null) {
+                LocationServiceMethods methods=new LocationServiceMethods(context);
+                methods.checkProvider();
+            }
+            else{
+                List<Location> locations = result.getLocations();
+                String latlng=locations.get(0).getLatitude()+":"+locations.get(0).getLongitude();
+                LocationRequestHelper.setLocationRequesting(context,latlng);
+                LocationResultHelper locationResultHelper = new LocationResultHelper(context, locations);locationResultHelper.checkDistanceBetween(locations.get(0));
+                locationResultHelper.saveResults();
+                Log.i(TAG, LocationResultHelper.getSavedLocationResult(context));
+            }
+        }
+
     }
 
 }

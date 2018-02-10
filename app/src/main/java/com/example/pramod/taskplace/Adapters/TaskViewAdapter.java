@@ -26,9 +26,9 @@ public class TaskViewAdapter extends BaseAdapter {
     private ArrayList<String> contents;
     private ArrayList<String> taskdates;
     private ArrayList<String> placenames;
-    private ArrayList<Double> distance;
+    private ArrayList<String> distance;
     private Context context;
-    public TaskViewAdapter(Context context, ArrayList<String> content, ArrayList<String> taskdates, ArrayList<String> placenames, ArrayList<Double> distance)
+    public TaskViewAdapter(Context context, ArrayList<String> content, ArrayList<String> taskdates, ArrayList<String> placenames, ArrayList<String> distance)
     {
         this.context=context;
         this.contents=content;

@@ -30,28 +30,24 @@ public class FirebaseDatabaseHelper {
     DatabaseReference taskDetailsCloudEndPoint;//end
     CurrentUserData currentUserData;
     private Context context;
-    ArrayList<TaskDetails> data;
     public FirebaseDatabaseHelper(Context context){
         taskDetailsCloudEndPoint= FirebaseDatabase.getInstance().getReference().child("Users");
         currentUserData=new CurrentUserData(context);
         this.context=context;
     }
 
-    public String addDataToFirebase(ArrayList<TaskDetails> EntriestoAdd) {
-        String taskid= taskDetailsCloudEndPoint.push().getKey();
-        for (TaskDetails Entry : EntriestoAdd) {
-            taskDetailsCloudEndPoint.child(currentUserData.getCurrentUID()).child(taskid).setValue(Entry).addOnCompleteListener(new OnCompleteListener<Void>() {
+    public String addDataToFirebase(TaskDetails details) {
+        String taskid = taskDetailsCloudEndPoint.push().getKey();
+        taskDetailsCloudEndPoint.child(currentUserData.getCurrentUID()).child(taskid).setValue(details).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
                         Log.i("DATA ADDED","SUCCESSFULLY ADDED DATA TO FIREBASE");
                     } else {
-
                         Log.i("DATA NOT ADDED","FAILED WHILE ADDING DATA TO FIREBASE");
                     }
                 }
             });
-        }
         return taskid;
 
     }
@@ -78,12 +74,12 @@ public class FirebaseDatabaseHelper {
         taskDetailsCloudEndPoint.child(currentUserData.getCurrentUID()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
-                data = new ArrayList<TaskDetails>();
+                //checking if data exist in database
                 if (!dataSnapshot.exists()) {
                     Toast.makeText(context,"Set some task",Toast.LENGTH_SHORT).show();
                     return;
                 }
+                //if data exist fetch all data from firebase and store it to local database...
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     String task_id = ds.getKey();
                     String content = ds.child("content").getValue(String.class);
@@ -100,14 +96,6 @@ public class FirebaseDatabaseHelper {
                     sqLiteStatement.bindString(6,String.valueOf(lati));
                     sqLiteStatement.bindString(7,String.valueOf(longi));
                     sqLiteStatement.execute();
-
-                    TaskDetails d = new TaskDetails();
-                    d.setTaskid(task_id);
-                    d.setPlace(place_n);
-                    d.setLat(lati);
-                    d.setLng(longi);
-                    d.setContent(content);
-                    d.setTaskdate(date);
                 }
 
 

@@ -16,17 +16,21 @@ import cat.ereza.customactivityoncrash.config.CaocConfig;
  */
 
 public class TaskPlace extends Application {
+    public GoogleApiHelper mgoogleApiHelper;
+    public static TaskPlace mInstance;
     @SuppressLint("RestrictedApi")
     public void onCreate(){
         super.onCreate();
+        mInstance=this;
+        mgoogleApiHelper=new GoogleApiHelper(mInstance);
         CaocConfig.Builder.create()
                 .backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT) //default: CaocConfig.BACKGROUND_MODE_SHOW_CUSTOM
                 .enabled(true) //default: true
-                .showErrorDetails(true) //default: true
+                .showErrorDetails(false) //default: true
                 .showRestartButton(true) //default: true
                 .logErrorOnRestart(false) //default: true
-                .trackActivities(true) //default: false
-                .minTimeBetweenCrashesMs(2000) //default: 3000
+                .trackActivities(false) //default: false
+                .minTimeBetweenCrashesMs(1000) //default: 3000
                 .errorDrawable(R.drawable.customactivityoncrash_error_image) //default: bug image
                 //.restartActivity(MainActivity.class) //default: null (your app's launch activity)
                 //.errorActivity(CustomErrorActivity.class) //default: null (default error activity)
@@ -34,5 +38,14 @@ public class TaskPlace extends Application {
                 .apply();
         CustomActivityOnCrash.install(this);
 
+    }
+    public static synchronized TaskPlace getmInstance(){
+        return mInstance;
+    }
+    public GoogleApiHelper getGoogleApiHelperInstance() {
+        return this.mgoogleApiHelper;
+    }
+    public static GoogleApiHelper getGoogleApiHelper() {
+        return getmInstance().getGoogleApiHelperInstance();
     }
 }

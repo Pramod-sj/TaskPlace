@@ -26,12 +26,13 @@ public class SplashScreen extends AppCompatActivity {
     SharedPreferences prefs;
     protected void onCreate(final Bundle s){
         super.onCreate(s);
-        setContentView(R.layout.splashscreen);
+        setContentView(R.layout.activity_splashscreen);
         TextView t=findViewById(R.id.animtextView);
         prefs=getSharedPreferences("first_launch",0);
         Animation a= AnimationUtils.loadAnimation(getApplicationContext(),R.anim.splashtextanim);
         t.startAnimation(a);
         final ProgressBar progressBar=findViewById(R.id.progressBar2);
+        progressBar.setVisibility(View.GONE);
         progressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor("#FF8C00"), PorterDuff.Mode.MULTIPLY);
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -46,9 +47,9 @@ public class SplashScreen extends AppCompatActivity {
                     startActivity(new Intent(SplashScreen.this,Login.class));
                     finish();
                 }
-                progressBar.setVisibility(View.GONE);
+                //progressBar.setVisibility(View.GONE);
             }
-        },2000);
+        },700);
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

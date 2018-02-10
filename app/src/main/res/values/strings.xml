@@ -118,4 +118,20 @@
     </plurals>
 
     <string name="default_channel">Default channel</string>
+
+
+
+    <string-array name="radius">
+        <item>50</item>
+        <item>100</item>
+        <item>150</item>
+        <item>200</item>
+    </string-array>
+
+    <string-array name="radiusMetre">
+        <item>50 metre</item>
+        <item>100 metre</item>
+        <item>150 metre</item>
+        <item>200 metre</item>
+    </string-array>
 </resources>

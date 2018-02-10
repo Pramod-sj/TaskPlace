@@ -30,8 +30,8 @@ import android.widget.Toast;
 
 import com.example.pramod.taskplace.CurrentUserData;
 import com.example.pramod.taskplace.Database.DatabaseHelper;
-import com.example.pramod.taskplace.Geofence.GeofenceMethods;
 import com.example.pramod.taskplace.R;
+import com.example.pramod.taskplace.TaskPlace;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -57,6 +57,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import es.dmoral.toasty.Toasty;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     CircleImageView circleImageView;
@@ -70,15 +71,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     StorageReference storageReference;
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
 
-    SharedPreferences preferences;
-    SharedPreferences.Editor editor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         storage=FirebaseStorage.getInstance();
         storageReference = storage.getReference();
-        buildGoogleApiClient();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         TextView username,useremail;
@@ -96,12 +94,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         };
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.setVerticalScrollBarEnabled(false);
         header=navigationView.getHeaderView(0);
-        circleImageView=(CircleImageView) header.findViewById(R.id.imageView);
+        circleImageView= header.findViewById(R.id.imageView);
         circleImageView.setClickable(true);
         circleImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -159,48 +156,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(!checkPermissions()){
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_PERMISSIONS_REQUEST_CODE);
         }
+        if(TaskPlace.getGoogleApiHelper().isConnected()){
+            mGoogleApiClient=TaskPlace.getGoogleApiHelper().getGoogleApiClient();
+        }
     }
 
     private boolean checkPermissions() {
         int permissionState = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION);
         return permissionState == PackageManager.PERMISSION_GRANTED;
     }
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(MainActivity.this)
-                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-                    @Override
-                    public void onConnected(@Nullable Bundle bundle) {
-
-                    }
-
-                    @Override
-                    public void onConnectionSuspended(int i) {
-
-                    }
-                })
-                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-                    }
-                })
-                .addApi(LocationServices.API)
-                .build();
-    }
     protected void onResume(){
         super.onResume();
-        locationPermissionChecker(mGoogleApiClient,MainActivity.this);
+        if(mGoogleApiClient.isConnected()) {
+            locationPermissionChecker(mGoogleApiClient, MainActivity.this);
+        }
     }
     @Override
     public void onStart() {
         super.onStart();
-        mGoogleApiClient.connect();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        mGoogleApiClient.disconnect();
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
@@ -219,6 +197,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     circleImageView.setImageBitmap(yourSelectedImage);
                 }
                 uploadImage();
+                break;
+            case REQUEST_PERMISSIONS_REQUEST_CODE:
+                switch (requestCode){
+                    case Activity.RESULT_OK:
+                        Toasty.success(getApplicationContext(),"Successfully granted required permission",Toast.LENGTH_SHORT).show();
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        Toasty.error(getApplicationContext(),"This application requires prompted permission",Toast.LENGTH_SHORT).show();
+
+                }
         }
     }
 
@@ -229,7 +217,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
-            moveTaskToBack(true);
+            finish();
+            System.exit(0);
         }
     }
 
@@ -242,12 +231,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.settingOption) {
             Intent i=new Intent(MainActivity.this,SettingsActivity.class);
             startActivity(i);
@@ -295,16 +280,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void navItem(int id){
         Fragment fragment = null;
         if (id == R.id.set_navtask) {
-            // Handle the camera action
             fragment=new SetTask();
+            getSupportFragmentManager().beginTransaction().replace(R.id.flContent, fragment).commit();
         }else if (id == R.id.view_navTask) {
             fragment=new ViewTask();
+            getSupportFragmentManager().beginTransaction().replace(R.id.flContent, fragment).commit();
         }else if(id==R.id.nav_logout){
             FirebaseAuth.getInstance().signOut();
             DatabaseHelper db=new DatabaseHelper(MainActivity.this);
             db.removeAlldata();
-            GeofenceMethods geofenceMethods=new GeofenceMethods(MainActivity.this,mGoogleApiClient);
-            geofenceMethods.removeallgeofences();
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -315,12 +299,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             },100);
         }
-        try {
-            getSupportFragmentManager().beginTransaction().replace(R.id.flContent, fragment).commit();
-        } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), String.valueOf(e), Toast.LENGTH_SHORT).show();
-        }
-
     }
     private void uploadImage() {
         if(ImagePATH != null)
@@ -353,40 +331,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     });
         }
     }
-    private void clearCache(){
-        try{
-            File cacheDir= new File(getCacheDir().getParent());
-            if(cacheDir.isDirectory()&&cacheDir!=null){
-                cacheDir.delete();
-                Toast.makeText(getApplicationContext(),"Cache removed",Toast.LENGTH_SHORT).show();
-            }
-            else{
-                Toast.makeText(getApplicationContext(),"Cache doesnt exist",Toast.LENGTH_SHORT).show();
-            }
-            File cacheExternalDir=getApplicationContext().getExternalCacheDir();
-            if(cacheExternalDir.isDirectory() && cacheExternalDir!=null){
-                cacheExternalDir.delete();
-                Toast.makeText(getApplicationContext(),"E Cache exist",Toast.LENGTH_SHORT).show();
-
-            }
-            else {
-                Toast.makeText(getApplicationContext(),"E Cache doesnt exist",Toast.LENGTH_SHORT).show();
-
-            }
-        }
-        catch(Exception e){Toast.makeText(getApplicationContext(),"Error while deleting cache\n"+e,Toast.LENGTH_SHORT).show();}
-    }
-
     public static void locationPermissionChecker(GoogleApiClient mGoogleApiClient, final Activity activity) {
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(30 * 1000);
-        locationRequest.setFastestInterval(5 * 1000);
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                .addLocationRequest(locationRequest);
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(3000);
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
         builder.setAlwaysShow(true);
-        PendingResult<LocationSettingsResult> result =
-                LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
+        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
         result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
             @Override
             public void onResult(LocationSettingsResult result) {
@@ -403,8 +355,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         try {
                             // Show the dialog by calling startResolutionForResult(),
                             // and check the result in onActivityResult().
-                            status.startResolutionForResult(
-                                    activity, 1000);
+                            status.startResolutionForResult(activity, REQUEST_PERMISSIONS_REQUEST_CODE);
                         } catch (Exception e) {
                             // Ignore the error.
                         }
@@ -417,9 +368,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
     }
-
-
-
-
 
 }

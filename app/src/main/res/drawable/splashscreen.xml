@@ -13,6 +13,6 @@
     <item
         android:gravity="center">
         <bitmap
-            android:src="@drawable/tasksvg"/>
+            android:src="@drawable/splashlogo"/>
     </item>
 </layer-list>

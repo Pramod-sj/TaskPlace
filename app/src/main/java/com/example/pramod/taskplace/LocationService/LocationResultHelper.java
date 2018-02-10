@@ -1,22 +1,27 @@
-
 package com.example.pramod.taskplace.LocationService;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
+import android.net.Uri;
+import android.os.Build;
 import android.preference.PreferenceManager;
+import android.service.notification.StatusBarNotification;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.app.NotificationChannel;
-
-
+import android.util.Log;
 import com.example.pramod.taskplace.Activities.MainActivity;
+import com.example.pramod.taskplace.Activities.Notificationpage;
+import com.example.pramod.taskplace.Database.DatabaseHelper;
 import com.example.pramod.taskplace.R;
-
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,26 +32,15 @@ import java.util.List;
  */
 class LocationResultHelper {
     ArrayList<String> locationData=new ArrayList<>();
-
     final static String KEY_LOCATION_UPDATES_RESULT = "location-update-result";
-
     final private static String PRIMARY_CHANNEL = "default";
-
-
     private Context mContext;
     private List<Location> mLocations;
     private NotificationManager mNotificationManager;
-
+    private String sr_no,tasktitle,taskdesc,place;
     LocationResultHelper(Context context, List<Location> locations) {
         mContext = context;
         mLocations = locations;
-        NotificationChannel channel = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            channel = new NotificationChannel(PRIMARY_CHANNEL, context.getString(R.string.default_channel), NotificationManager.IMPORTANCE_DEFAULT);
-            channel.setLightColor(Color.GREEN);
-            channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
-            getNotificationManager().createNotificationChannel(channel);
-        }
     }
 
     /**
@@ -113,40 +107,99 @@ class LocationResultHelper {
      * Displays a notification with the location results.
      */
 
-    void showNotification() {
-        Intent notificationIntent = new Intent(mContext, MainActivity.class);
+    void showNotification(String sr_no,String place,String tasktitle,String taskdesc,String task_id) {
 
+        //notification channel is required for Android oreo
+        NotificationChannel channel = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            channel = new NotificationChannel(PRIMARY_CHANNEL, mContext.getString(R.string.default_channel), NotificationManager.IMPORTANCE_DEFAULT);
+            channel.enableVibration(true);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            getNotificationManager().createNotificationChannel(channel);
+        }
+
+        //Intent i=new Intent(mContext,LocationUpdatesBroadcastReceiver.class);
+        //PendingIntent broadIntent=PendingIntent.getBroadcast(mContext,0,i,0);
+        //swipe delete
+        Intent swipeActionIntent=new Intent(mContext,SwipeActionEvent.class);
+        PendingIntent swipePendingIntent=PendingIntent.getBroadcast(mContext,1,swipeActionIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        //end of swipe delete
+
+        Intent actionIntent=new Intent(mContext,ActionEvent.class);
+        Log.i("not_id",task_id);
+        actionIntent.putExtra("task_id",task_id);
+        actionIntent.putExtra("not_id",sr_no);
+        PendingIntent pendingIntent=PendingIntent.getBroadcast(mContext,1,actionIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent notificationIntent = new Intent(mContext, Notificationpage.class);
+        notificationIntent.putExtra("task_id",task_id);
         // Construct a task stack.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
-
         // Add the main Activity to the task stack as the parent.
         stackBuilder.addParentStack(MainActivity.class);
-
         // Push the content Intent onto the stack.
         stackBuilder.addNextIntent(notificationIntent);
-
         // Get a PendingIntent containing the entire back stack.
         PendingIntent notificationPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(mContext);
+        String url=preferences.getString("notifications_new_message_ringtone","content://settings/system/notification_sound");
+        NotificationCompat.Builder notification = new NotificationCompat.Builder(mContext,PRIMARY_CHANNEL);
+        notification.setSmallIcon(R.mipmap.ic_launcher);
+        notification.setContentTitle(place);
+        notification.setContentText(tasktitle);
+        notification.setAutoCancel(true);
+        notification.addAction(R.drawable.ic_logout_black_24dp,"MARK AS DONE",pendingIntent);
+        notification.setContentIntent(notificationPendingIntent);
+        notification.setSound(Uri.parse(url));
+        if(preferences.getBoolean("notifications_new_message_vibrate",false)){
+            notification.setVibrate(new long[]{50,70,100,120});
+        }
+        notification.setDeleteIntent(swipePendingIntent);
+        getNotificationManager().notify(Integer.parseInt(sr_no),notification.build());
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-
-            Notification.Builder notificationBuilder = new Notification.Builder(mContext,PRIMARY_CHANNEL)
-                    .setContentTitle(getLocationResultTitle())
-                    .setContentText(getLocationResultText())
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setAutoCancel(true)
-                    .setContentIntent(notificationPendingIntent);
-            getNotificationManager().notify(0, notificationBuilder.build());
-        }else{
-            Notification notification = new NotificationCompat.Builder(mContext)
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setContentTitle(getLocationResultTitle())
-                    .setContentText(getLocationResultText())
-                    .setAutoCancel(true)
-                    .setContentIntent(notificationPendingIntent)
-                    .build();
-            getNotificationManager().notify(0,notification);
+    }
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void checkDistanceBetween(Location currLoc){
+        DatabaseHelper db=new DatabaseHelper(mContext);
+        SQLiteDatabase sql=db.getReadableDatabase();
+        String query="select * from PlaceDatabase";
+        Location destloc=new Location("");
+        Cursor cursor = sql.rawQuery(query, null);
+        SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(mContext);
+        while(cursor.moveToNext()){
+            destloc.setLatitude(Double.valueOf(cursor.getString(6)));
+            destloc.setLongitude(Double.valueOf(cursor.getString(7)));
+            if(currLoc.distanceTo(destloc)<Integer.parseInt(preferences.getString("radius","100"))){
+                taskdesc=cursor.getString(4);
+                tasktitle=cursor.getString(3);
+                sr_no=cursor.getString(0);
+                place=cursor.getString(2);
+                if(LocationRequestHelper.getNotificationFlag(mContext)==true) {
+                    showNotification(sr_no, place, tasktitle, taskdesc, cursor.getString(1));
+                    LocationRequestHelper.setNotificationFlag(mContext,false);
+                }
+            }
         }
 
     }
+    public static class ActionEvent extends BroadcastReceiver{
+        @Override
+        public void onReceive(Context context, Intent intent) {
+                DatabaseHelper db = new DatabaseHelper(context);
+                SQLiteDatabase sql = db.getWritableDatabase();
+                sql.delete("PlaceDatabase", "task_id=?", new String[]{intent.getStringExtra("task_id")});
+                NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.cancel(Integer.parseInt(intent.getStringExtra("not_id")));
+                LocationRequestHelper.setNotificationFlag(context, true);
+        }
+    }
+    public static class SwipeActionEvent extends BroadcastReceiver{
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //set flag to true so that to receive message again
+            LocationRequestHelper.setNotificationFlag(context, true);
+        }
+
+    }
+
 }
+
