@@ -36,25 +36,26 @@ import java.util.Locale;
 
 import static com.example.pramod.taskplace.R.layout.activity_maps;
 
-public class MapsActivity extends Fragment implements OnMapReadyCallback,GoogleMap.OnMapLongClickListener {
+public class MapsActivity extends Fragment implements OnMapReadyCallback,GoogleMap.OnMapClickListener{
     SupportPlaceAutocompleteFragment supportPlaceAutocompleteFragment;
     private GoogleMap mMap;
     View view;
     String placeSelected;
-    String Latlng;
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,@Nullable Bundle savedInstanceState) {
         view=inflater.inflate(activity_maps,container,false);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment)this.getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
         supportPlaceAutocompleteFragment= (SupportPlaceAutocompleteFragment)this.getChildFragmentManager().findFragmentById(R.id.place);
+        supportPlaceAutocompleteFragment.setHint("You can search place or click on map to select place..");
         supportPlaceAutocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
-                mMap.addMarker(new MarkerOptions().position(place.getLatLng()).snippet("Click me").title("select me as your location"));
+                mMap.clear();
+                Marker marker=mMap.addMarker(new MarkerOptions().position(place.getLatLng()).snippet("Click me").title("select me as your location"));
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(),15));
+                marker.showInfoWindow();
             }
 
             @Override
@@ -89,6 +90,9 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,GoogleM
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(21.7679,78.8718),3));
+        mMap.setOnMapClickListener(this);
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
@@ -110,11 +114,12 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,GoogleM
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flContent,f).commit();
             }
         });
-
     }
-
     @Override
-    public void onMapLongClick(LatLng latLng) {
-        mMap.addMarker(new MarkerOptions().position(latLng).snippet("Click me").title("select me as your location"));
+    public void onMapClick(LatLng latLng) {
+        mMap.clear();
+        Marker marker=mMap.addMarker(new MarkerOptions().position(latLng).snippet("Click me").title("select me as your location"));
+        marker.showInfoWindow();
+        Log.i("MAP","YOU JUST CLICK ON MAP");
     }
 }
