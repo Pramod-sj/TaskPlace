@@ -1,21 +1,28 @@
 package com.example.pramod.taskplace.Activities;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.LocationManager;
+import android.net.Network;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -28,10 +35,14 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.pramod.taskplace.CurrentUserData;
-import com.example.pramod.taskplace.Database.DatabaseHelper;
+import com.example.pramod.taskplace.LocationService.LocationUpdatesBroadcastReceiver;
+import com.example.pramod.taskplace.Model.CurrentUserData;
+import com.example.pramod.taskplace.Fragments.NavMapFragment;
+import com.example.pramod.taskplace.Fragments.SetTaskFragment;
+import com.example.pramod.taskplace.Fragments.ViewTaskFragment;
 import com.example.pramod.taskplace.R;
 import com.example.pramod.taskplace.TaskPlace;
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -52,7 +63,6 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -66,11 +76,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     final int SELECT_PHOTO=100;
     AlertDialog alertDialog;
     GoogleApiClient mGoogleApiClient;
+
+    TextView username,useremail;
     //Firebase
     FirebaseStorage storage;
     StorageReference storageReference;
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,8 +90,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         storageReference = storage.getReference();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        TextView username,useremail;
-        CurrentUserData currentUserData=new CurrentUserData(MainActivity.this);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
@@ -107,17 +116,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 alertDialog.show();
             }
         });
-
         username=header.findViewById(R.id.username);
         useremail=header.findViewById(R.id.useremail);
-        useremail.setText(currentUserData.getCurrentUserEmail());
-        String[] name=currentUserData.getCurrentUserEmail().split("@");
-        username.setText(name[0]);
+        setUserProfile();
         //for notification
         String notifydata=getIntent().getStringExtra("NotifyPage");
+        String ScrollViewActivity=getIntent().getStringExtra("scrollView");
         if(notifydata!=null){
-            if(notifydata.equals("ViewTask")) {
-                Fragment f = new ViewTask();
+            if(notifydata.equals("ViewTaskFragment")) {
+                Fragment f = new ViewTaskFragment();
+                getSupportFragmentManager().beginTransaction().replace(R.id.flContent, f).commit();
+            }
+        }else if(ScrollViewActivity!=null){
+            if(ScrollViewActivity.equals("scrollView")){
+                Fragment f = new ViewTaskFragment();
                 getSupportFragmentManager().beginTransaction().replace(R.id.flContent, f).commit();
             }
         }
@@ -158,6 +170,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         if(TaskPlace.getGoogleApiHelper().isConnected()){
             mGoogleApiClient=TaskPlace.getGoogleApiHelper().getGoogleApiClient();
+        }
+    }
+    public void setUserProfile(){
+        Uri url=FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl();
+        String email_id,user_name;
+        email_id=FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        user_name=FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        if(url!=null&&email_id!=null&&user_name!=null){
+            Picasso.with(MainActivity.this).load(url).placeholder(R.drawable.placeholder).into(circleImageView);
+            useremail.setText(email_id);
+            username.setText(user_name);
+        }
+        else{
+            CurrentUserData currentUserData=new CurrentUserData(MainActivity.this);
+            useremail.setText(currentUserData.getCurrentUserEmail());
+            String[] name=currentUserData.getCurrentUserEmail().split("@");
+            username.setText(name[0]);
         }
     }
 
@@ -280,24 +309,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void navItem(int id){
         Fragment fragment = null;
         if (id == R.id.set_navtask) {
-            fragment=new SetTask();
+            fragment=new SetTaskFragment();
             getSupportFragmentManager().beginTransaction().replace(R.id.flContent, fragment).commit();
         }else if (id == R.id.view_navTask) {
-            fragment=new ViewTask();
+            fragment=new ViewTaskFragment();
             getSupportFragmentManager().beginTransaction().replace(R.id.flContent, fragment).commit();
-        }else if(id==R.id.nav_logout){
-            FirebaseAuth.getInstance().signOut();
-            DatabaseHelper db=new DatabaseHelper(MainActivity.this);
-            db.removeAlldata();
-            new Handler().postDelayed(new Runnable() {
+        }
+        else if(id==R.id.map_nav){
+            fragment=new NavMapFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.flContent, fragment).commit();
+        }
+
+        else if(id==R.id.nav_logout){
+            final GoogleApiClient mAuthGoogleApiClient=buildGoogleApiClientAuth();
+            mAuthGoogleApiClient.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
                 @Override
-                public void run() {
-                    Intent i=new Intent(MainActivity.this,Login.class);
-                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(i);
-                    finish();
+                public void onConnected(@Nullable Bundle bundle) {
+                    FirebaseAuth.getInstance().signOut();
+                    if(mAuthGoogleApiClient.isConnected()){
+                        Auth.GoogleSignInApi.signOut(mAuthGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
+                            @Override
+                            public void onResult(@NonNull Status status) {
+                                if(status.isSuccess()){
+                                    TaskPlace.getDatabaseHelper().removeAlldata();
+                                    Intent i=new Intent(MainActivity.this,LoginActivity.class);
+                                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    startActivity(i);
+                                    finish();
+                                }
+                            }
+                        });
+                    }
                 }
-            },100);
+
+                @Override
+                public void onConnectionSuspended(int i) {
+
+                }
+            });
         }
     }
     private void uploadImage() {
@@ -367,6 +416,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         });
+    }
+
+    protected synchronized GoogleApiClient buildGoogleApiClientAuth() {
+        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(MainActivity.this)
+                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                    @Override
+                    public void onConnected(@Nullable Bundle bundle) {
+
+                    }
+
+                    @Override
+                    public void onConnectionSuspended(int i) {
+
+                    }
+                })
+                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+                    }
+                })
+                .addApi(Auth.GOOGLE_SIGN_IN_API)
+                .build();
+        mGoogleApiClient.connect();
+        return mGoogleApiClient;
     }
 
 }

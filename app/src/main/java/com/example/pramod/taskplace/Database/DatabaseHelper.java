@@ -5,12 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteStatement;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 
-import com.example.pramod.taskplace.TaskDetails;
-import com.google.android.gms.tasks.Task;
+import com.example.pramod.taskplace.Model.TaskDetails;
 
 import java.util.ArrayList;
 
@@ -56,10 +53,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase sql=this.getWritableDatabase();
         //adding data to offline db
         ContentValues values = new ContentValues();
-        values.put("sr_no",details.getTaskid());
         values.put("task_id", task_id);
         values.put("place", details.getPlace());
-        values.put("task_title", details.getContent());
+        values.put("task_title", details.getTaskTitle());
         values.put("task_desc", details.getTaskDesc());
         values.put("taskdate", details.getTaskdate());
         values.put("latitude", details.getLat());
@@ -84,11 +80,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             d.setPlace(cursor.getString(2));
             d.setLat(cursor.getString(6));
             d.setLng(cursor.getString(7));
-            d.setContent(cursor.getString(3));
+            d.setTaskTitle(cursor.getString(3));
             d.setTaskDesc(cursor.getString(4));
             d.setTaskdate(cursor.getString(5));
             details.add(d);
         }
         return details;
     }
+    public TaskDetails getDetailsById(String id){
+        //adding by 1 because we are getting their position from list view..ie.start from 0 and so on
+        String query="select * from PlaceDatabase where task_id='"+id+"'";
+        Cursor cursor=this.getReadableDatabase().rawQuery(query,null);
+        cursor.moveToNext();
+        TaskDetails details=new TaskDetails(cursor.getString(3)
+                ,cursor.getString(4),cursor.getString(2)
+                ,cursor.getString(5)
+                ,cursor.getString(1));
+        return details;
+    }
+    public void updateTaskDetails(String id,String taskTitle,String taskDesc){
+        ContentValues values=new ContentValues();
+        values.put(TASK_TITLE,taskTitle);
+        values.put(TASK_DESC,taskDesc);
+        int x=this.getWritableDatabase().update(t_name,values,"task_id='"+id+"'",null);
+    }
+
 }

@@ -20,10 +20,14 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.location.GpsStatus;
 import android.location.Location;
+import android.location.LocationManager;
+import android.media.audiofx.Equalizer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -38,6 +42,8 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
 import java.util.List;
+
+import es.dmoral.toasty.Toasty;
 
 /**
  * Receiver for handling location updates.
@@ -62,24 +68,39 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         this.context=context;
+        Log.i("INTENT",intent.getAction());
+        if(intent.getAction().equals("android.location.PROVIDERS_CHANGED")){
+            if(LocationRequestHelper.getRequestingTrigger(context)==false) {
+                int mode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE, 0);
+                Log.i("MODE", String.valueOf(mode));
+                if (mode == 0) {
+                    Toasty.error(context, "No way to get Location Updates", Toast.LENGTH_SHORT).show();
+                } else if (mode == 2) {
+                    Toasty.warning(context, "App may not work properly", Toast.LENGTH_SHORT).show();
+                } else if (mode == 1) {
+                    Toasty.warning(context, "wait we are working on this mode for now change to GPS provider", Toast.LENGTH_LONG).show();
+                } else if (mode == 3) {
+                    Toasty.success(context, "Yeah we got all the stuff we needed...now make your tasks active", Toast.LENGTH_LONG).show();
+                }
+            }
+
+        }
+
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
             if(LocationRequestHelper.getRequestingTrigger(context)==false) {
                 if (TaskPlace.getGoogleApiHelper().isConnected()) {
                     mGoogleApiClient = TaskPlace.getGoogleApiHelper().getGoogleApiClient();
                     Toast.makeText(context, String.valueOf(TaskPlace.getGoogleApiHelper().getGoogleApiClient().isConnected()), Toast.LENGTH_SHORT).show();
                 }
-                Toast.makeText(context, "no api client", Toast.LENGTH_SHORT).show();
                 LocationServiceMethods methods = new LocationServiceMethods(context, mGoogleApiClient);
                 methods.createLocationRequest();
                 methods.requestLocationUpdates();
             }
         }
         if (intent.getAction().equals(ACTION_PROCESS_UPDATES)) {
-            Log.i("hello","bro");
             LocationResult result = LocationResult.extractResult(intent);
             if (result == null) {
-                LocationServiceMethods methods=new LocationServiceMethods(context);
-                methods.checkProvider();
+                return;
             }
             else{
                 List<Location> locations = result.getLocations();

@@ -1,4 +1,4 @@
-package com.example.pramod.taskplace;
+package com.example.pramod.taskplace.Model;
 
 import android.content.Context;
 import android.content.SharedPreferences;

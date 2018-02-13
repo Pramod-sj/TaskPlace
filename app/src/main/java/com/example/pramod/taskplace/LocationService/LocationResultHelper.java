@@ -21,6 +21,7 @@ import android.util.Log;
 import com.example.pramod.taskplace.Activities.MainActivity;
 import com.example.pramod.taskplace.Activities.Notificationpage;
 import com.example.pramod.taskplace.Database.DatabaseHelper;
+import com.example.pramod.taskplace.Database.FirebaseDatabaseHelper;
 import com.example.pramod.taskplace.R;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -130,15 +131,12 @@ class LocationResultHelper {
         actionIntent.putExtra("task_id",task_id);
         actionIntent.putExtra("not_id",sr_no);
         PendingIntent pendingIntent=PendingIntent.getBroadcast(mContext,1,actionIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-        Intent notificationIntent = new Intent(mContext, Notificationpage.class);
+        Intent notificationIntent = new Intent(mContext, MainActivity.class);
         notificationIntent.putExtra("task_id",task_id);
-        // Construct a task stack.
+        notificationIntent.putExtra("NotifyPage","ViewTaskFragment");
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
-        // Add the main Activity to the task stack as the parent.
         stackBuilder.addParentStack(MainActivity.class);
-        // Push the content Intent onto the stack.
         stackBuilder.addNextIntent(notificationIntent);
-        // Get a PendingIntent containing the entire back stack.
         PendingIntent notificationPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
         SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(mContext);
         String url=preferences.getString("notifications_new_message_ringtone","content://settings/system/notification_sound");
@@ -155,7 +153,6 @@ class LocationResultHelper {
         }
         notification.setDeleteIntent(swipePendingIntent);
         getNotificationManager().notify(Integer.parseInt(sr_no),notification.build());
-
     }
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void checkDistanceBetween(Location currLoc){
@@ -186,6 +183,8 @@ class LocationResultHelper {
         public void onReceive(Context context, Intent intent) {
                 DatabaseHelper db = new DatabaseHelper(context);
                 SQLiteDatabase sql = db.getWritableDatabase();
+                FirebaseDatabaseHelper helper=new FirebaseDatabaseHelper(context);
+                helper.removeDatafromFirebase(intent.getStringExtra("task_id"));
                 sql.delete("PlaceDatabase", "task_id=?", new String[]{intent.getStringExtra("task_id")});
                 NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.cancel(Integer.parseInt(intent.getStringExtra("not_id")));

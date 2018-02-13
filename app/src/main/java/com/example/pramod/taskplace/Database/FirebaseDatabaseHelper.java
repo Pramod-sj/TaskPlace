@@ -4,12 +4,11 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.pramod.taskplace.TaskDetails;
-import com.example.pramod.taskplace.CurrentUserData;
+import com.example.pramod.taskplace.Model.TaskDetails;
+import com.example.pramod.taskplace.Model.CurrentUserData;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -17,9 +16,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import java.sql.PreparedStatement;
-import java.util.ArrayList;
 
 /**
  * Created by pramod on 4/2/18.
@@ -82,7 +78,7 @@ public class FirebaseDatabaseHelper {
                 //if data exist fetch all data from firebase and store it to local database...
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     String task_id = ds.getKey();
-                    String content = ds.child("content").getValue(String.class);
+                    String content = ds.child("taskTitle").getValue(String.class);
                     String desc=ds.child("taskDesc").getValue(String.class);
                     String longi = ds.child("lng").getValue(String.class);
                     String lati = ds.child("lat").getValue(String.class);
@@ -98,6 +94,29 @@ public class FirebaseDatabaseHelper {
                     sqLiteStatement.execute();
                 }
 
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+    public void updateDataInFirebase(final String task_id, final String tasktitle, final String taskDesc){
+        taskDetailsCloudEndPoint.child(currentUserData.getCurrentUID()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                //checking if data exist in database
+                if (!dataSnapshot.exists()) {
+                    return;
+                }
+                //if data exist fetch all data from firebase and store it to local database...
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    taskDetailsCloudEndPoint.child(currentUserData.getCurrentUID()).child(task_id).child("taskTitle").setValue(tasktitle);
+                    taskDetailsCloudEndPoint.child(currentUserData.getCurrentUID()).child(task_id).child("taskDesc").setValue(taskDesc);
+                }
+                Log.i("FIREBASE","UPDATED VALUES");
 
             }
 

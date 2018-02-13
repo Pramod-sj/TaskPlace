@@ -1,22 +1,19 @@
-package com.example.pramod.taskplace.Activities;
+package com.example.pramod.taskplace.Fragments;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Application;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.location.Location;
-import android.os.AsyncTask;
-import android.os.Handler;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -31,28 +28,28 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.pramod.taskplace.Adapters.TaskViewAdapter;
 import com.example.pramod.taskplace.Database.FirebaseDatabaseHelper;
 import com.example.pramod.taskplace.LocationService.LocationRequestHelper;
 import com.example.pramod.taskplace.LocationService.LocationServiceMethods;
-import com.example.pramod.taskplace.CurrentUserData;
+import com.example.pramod.taskplace.Model.CurrentUserData;
 import com.example.pramod.taskplace.Database.DatabaseHelper;
 import com.example.pramod.taskplace.R;
-import com.example.pramod.taskplace.TaskDetails;
+import com.example.pramod.taskplace.Model.TaskDetails;
 import com.example.pramod.taskplace.TaskPlace;
-import com.google.android.gms.common.ConnectionResult;
+import com.expertprogramming.taskplace.ScrollingActivity;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
-public class ViewTask extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener{
+import es.dmoral.toasty.Toasty;
+
+public class ViewTaskFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener{
     ArrayList<String> distMeter;
     View view;
     CurrentUserData currentUserData;
@@ -60,44 +57,31 @@ public class ViewTask extends Fragment implements SharedPreferences.OnSharedPref
     GoogleApiClient mGoogleApiClient;
     ProgressDialog progressDialog;
     //array for viewing purpose
+    ArrayList<String> firebaseIDS=new ArrayList<>();
     ArrayList<String> contents=new ArrayList<String>();
     ArrayList<String> dates=new ArrayList<String>();
     ArrayList<String> places=new ArrayList<String>();
-    HashMap<String,LatLng> LANDMARKS;
     ProgressBar pg1;
     ListView listView;
     Switch aSwitch;
-    SharedPreferences preferences;
-    SharedPreferences.Editor editor;
-    LinearLayout container;
-    ArrayList<TaskDetails> data;
-    ArrayList<String> ids=new ArrayList<String>();
+    //ArrayList<TaskDetails> data=new ArrayList<>();
     Snackbar snackbar;
     //ArrayAdapter<String> arrayAdapter;
     TaskViewAdapter adapter;
     DatabaseHelper db;
     LinearLayout ll;
-    SQLiteDatabase sql;
     LocationServiceMethods methods;
-    public void onAttached(Activity activity){
-        super.onAttach(activity);
-
-    }
     @SuppressLint("MissingPermission")
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.i("oncreateview","inside it");
         view=inflater.inflate(R.layout.activity_view_task, container, false);
         //getting GoogleApiClient from Application using singleton;
         getGoogleApiClient();
-
-        db=new DatabaseHelper(getActivity());
-        sql=db.getWritableDatabase();
+        db=TaskPlace.getDatabaseHelper();
         pg1=view.findViewById(R.id.loading);
         distMeter=new ArrayList<>();
-        LANDMARKS=new HashMap<>();
         listView=view.findViewById(R.id.listView);
-        adapter=new TaskViewAdapter(getActivity().getBaseContext(),contents,dates,places,distMeter);
-        listView.setAdapter(adapter);
+        adapter=new TaskViewAdapter(getActivity().getBaseContext(),contents,dates,places,distMeter,firebaseIDS);
         ll=view.findViewById(R.id.ll);
         pg1.getIndeterminateDrawable().setColorFilter(Color.parseColor("#FF8C00"), PorterDuff.Mode.MULTIPLY);
         aSwitch=view.findViewById(R.id.taskActivator);
@@ -108,6 +92,9 @@ public class ViewTask extends Fragment implements SharedPreferences.OnSharedPref
         listViewListener();
         //inistantiating LocationServiceMethods
         methods=new LocationServiceMethods(getActivity(),mGoogleApiClient);
+
+
+
         return view;
     }
     public void getGoogleApiClient(){
@@ -119,45 +106,30 @@ public class ViewTask extends Fragment implements SharedPreferences.OnSharedPref
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final int index=position;
-                AlertDialog.Builder builder=new AlertDialog.Builder(getActivity());
-                builder.setTitle("Task")
-                        .setMessage("Do you want to remove this task")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                removeTask(data.get(index).getTaskid());
-                                //disable if no data exists
-                                switchState();
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                            }
-                        })
-                        .setCancelable(false);
-                AlertDialog alert=builder.create();
-                alert.show();
+                TextView firebase_id=view.findViewById(R.id.firebaseId);
+                Intent i=new Intent(getActivity(), ScrollingActivity.class);
+                i.putExtra("id",firebase_id.getText().toString());
+                startActivity(i);
             }
         });
     }
     private void switchState(){
+
         snackbar=Snackbar.make(ll,"No Task",Snackbar.LENGTH_INDEFINITE)
                 .setAction("Set some tasks", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Fragment f=new SetTask();
+                        Fragment f=new SetTaskFragment();
                         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flContent,f).commit();
                     }
                 });
+
         fetchOfflineData();
         if(!db.isDataExist()) {
             methods.removeLocationUpdates();
             aSwitch.setClickable(false);
+            aSwitch.setChecked(false);
             snackbar.show();
-
         }
         else {
             snackbar.dismiss();
@@ -220,23 +192,17 @@ public class ViewTask extends Fragment implements SharedPreferences.OnSharedPref
         }
         for(TaskDetails details:db.fetchData()){
             dates.add(details.getTaskdate());
-            contents.add(details.getContent());
+            contents.add(details.getTaskTitle());
             places.add(details.getPlace());
+            firebaseIDS.add(details.getTaskid());
         }
         pg1.setVisibility(View.GONE);
+        listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
         listView.setVisibility(View.VISIBLE);
         aSwitch.setVisibility(View.VISIBLE);
     }
 
-    public void removeTask(String ids){
-        LANDMARKS.remove(ids);
-        db.deteleData(ids);
-        FirebaseDatabaseHelper firebaseDatabase=new FirebaseDatabaseHelper(getActivity());
-        firebaseDatabase.removeDatafromFirebase(ids);
-        Snackbar.make(ll,"Successfully removed",Snackbar.LENGTH_SHORT).show();
-        fetchOfflineData();
-    }
 
 
 
@@ -252,7 +218,7 @@ public class ViewTask extends Fragment implements SharedPreferences.OnSharedPref
             currloc.setLatitude(Double.parseDouble(curr[0]));
             currloc.setLongitude(Double.parseDouble(curr[1]));
             String query="select * from PlaceDatabase";
-            Cursor cursor = sql.rawQuery(query, null);
+            Cursor cursor = db.getReadableDatabase().rawQuery(query, null);
             distMeter.clear();
             while(cursor.moveToNext()){
                 destloc.setLatitude(Double.valueOf(cursor.getString(6)));
@@ -261,6 +227,13 @@ public class ViewTask extends Fragment implements SharedPreferences.OnSharedPref
                 distMeter.add((int)currloc.distanceTo(destloc)+" m");
             }
             adapter.notifyDataSetChanged();
+        }
+    }
+    @Override
+    public void onPause(){
+        super.onPause();
+        if(snackbar.isShown()){
+            snackbar.dismiss();
         }
     }
 

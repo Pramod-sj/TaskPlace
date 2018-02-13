@@ -17,18 +17,19 @@ import com.example.pramod.taskplace.R;
 
 public class OpenLibraries_Activity extends AppCompatActivity {
     ListView listView;
-    String[] LibDesc={"Yet another implementation of Floating Action Button for Android with lots of features.",
+    String[] LibDesc={
             "A fast circular ImageView perfect for profile images. This is based on RoundedImageView from Vince Mi which itself is based on techniques recommended by Romain Guy.",
             "A powerful image downloading and caching library for Android.",
             "This library allows launching a custom activity when the app crashes, instead of showing the hated Unfortunately, X has stopped dialog.",
-            "An easy to use and customizable welcome screen for Android apps."
+            "An easy to use and customizable welcome screen for Android apps.",
+            "An Customized Toast"
     };
-    String[] LibName={"FloatingActionButton",
+    String[] LibName={
                     "CircleImageView",
                     "Picasso",
                     "CustomActivityOnCrash",
-                    "Welcome"
-
+                    "Welcome",
+                    "Toasty"
                         };
     protected void onCreate(Bundle b){
         super.onCreate(b);

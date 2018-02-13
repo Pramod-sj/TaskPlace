@@ -10,9 +10,7 @@
             <padding android:left="0dip" android:top="0dip" android:right="0dip" android:bottom="0dip" />
         </shape>
     </item>
-    <item
-        android:gravity="center">
-        <bitmap
-            android:src="@drawable/splashlogo"/>
+    <item>
+        <bitmap android:src="@drawable/splash_screen"/>
     </item>
 </layer-list>

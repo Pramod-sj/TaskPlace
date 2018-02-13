@@ -13,7 +13,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.pramod.taskplace.OnRecentClearService;
 import com.example.pramod.taskplace.R;
 import com.stephentuso.welcome.WelcomeHelper;
 
@@ -38,13 +37,12 @@ public class SplashScreen extends AppCompatActivity {
             @Override
             public void run() {
                 if (prefs.getBoolean("first_launch",true)) {
-                    startService(new Intent(SplashScreen.this, OnRecentClearService.class));
                     // The welcome screen appears
                     WelcomeHelper sampleWelcomeScreen = new WelcomeHelper(SplashScreen.this, StartPage.class);
                     sampleWelcomeScreen.forceShow();
                 }
                 else{
-                    startActivity(new Intent(SplashScreen.this,Login.class));
+                    startActivity(new Intent(SplashScreen.this,LoginActivity.class));
                     finish();
                 }
                 //progressBar.setVisibility(View.GONE);
@@ -58,7 +56,7 @@ public class SplashScreen extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 // Code here will run if the welcome screen was completed
                 prefs.edit().putBoolean("first_launch",false).commit();
-                startActivity(new Intent(SplashScreen.this,Login.class));
+                startActivity(new Intent(SplashScreen.this,LoginActivity.class));
 
 
             } else {

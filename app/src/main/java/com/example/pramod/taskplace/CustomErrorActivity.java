@@ -38,8 +38,8 @@ public class CustomErrorActivity extends AppCompatActivity {
         //Otherwise, if you don't finish the activity, you will get the CustomErrorActivity on the activity stack and it will be visible again under some circumstances.
         //Also, you will get multiprocess problems in API<17.
 
-        //TextView errorDetailsText = findViewById(R.id.error_details);
-        //errorDetailsText.setText(CustomActivityOnCrash.getStackTraceFromIntent(getIntent()));
+        TextView errorDetailsText = findViewById(R.id.error_details);
+        errorDetailsText.setText(CustomActivityOnCrash.getStackTraceFromIntent(getIntent()));
         Button restartButton = findViewById(R.id.restart_button);
         final CaocConfig config = CustomActivityOnCrash.getConfigFromIntent(getIntent());
         if (config == null) {

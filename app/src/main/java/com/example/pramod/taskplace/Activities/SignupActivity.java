@@ -26,7 +26,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import es.dmoral.toasty.Toasty;
 
-public class Signup extends AppCompatActivity {
+public class SignupActivity extends AppCompatActivity {
     FirebaseAuth auth;
     EditText email,password;
     Button signup;
@@ -36,7 +36,7 @@ public class Signup extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        progressDialog=new ProgressDialog(Signup.this);
+        progressDialog=new ProgressDialog(SignupActivity.this);
         progressDialog.setIndeterminate(true);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         setContentView(R.layout.activity_signup);
@@ -52,7 +52,7 @@ public class Signup extends AppCompatActivity {
         itoLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i=new Intent(Signup.this,Login.class);
+                Intent i=new Intent(SignupActivity.this,LoginActivity.class);
                 startActivity(i);
             }
         });
@@ -64,15 +64,15 @@ public class Signup extends AppCompatActivity {
                 String email_id=email.getText().toString();
                 String password_=password.getText().toString();
                 if(TextUtils.isEmpty(email_id)){
-                    Toast.makeText(getApplicationContext(),"Please enter your email id",Toast.LENGTH_SHORT).show();
+                    Toasty.warning(getApplicationContext(),"Please enter your email id",Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if(TextUtils.isEmpty(password_)){
-                    Toast.makeText(getApplicationContext(),"Please enter password",Toast.LENGTH_SHORT).show();
+                    Toasty.warning(getApplicationContext(),"Please enter password",Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if(password_.length()<6){
-                    Toast.makeText(getApplicationContext(),"Password to short",Toast.LENGTH_SHORT).show();
+                    Toasty.warning(getApplicationContext(),"Password to short",Toast.LENGTH_SHORT).show();
                     return;
 
                 }
@@ -81,7 +81,7 @@ public class Signup extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (!task.isSuccessful()) {
                             if (task.getException() instanceof FirebaseAuthUserCollisionException) {
-                                Toasty.warning(getApplicationContext(), "User with this email already exist.", Toast.LENGTH_SHORT).show();
+                                Toasty.error(getApplicationContext(), "User with this email already exist.", Toast.LENGTH_SHORT).show();
                                 progressDialog.cancel();
                                 return;
                             }

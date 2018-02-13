@@ -1,15 +1,23 @@
 package com.example.pramod.taskplace.LocationService;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.pramod.taskplace.Activities.MainActivity;
+import com.example.pramod.taskplace.R;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -61,8 +69,8 @@ public class LocationServiceMethods {
     }
     public void createLocationRequest(){
         locationRequest=new LocationRequest();
-        locationRequest.setInterval(7000);
-        locationRequest.setFastestInterval(3000);
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
         SharedPreferences pref= PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor=pref.edit();
         if(pref.getBoolean("mode",false)==true){
@@ -101,8 +109,5 @@ public class LocationServiceMethods {
         intent.setAction(LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES);
         return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
-
-
-
 
 }

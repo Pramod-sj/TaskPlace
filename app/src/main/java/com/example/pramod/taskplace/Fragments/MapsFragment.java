@@ -1,25 +1,20 @@
-package com.example.pramod.taskplace.Activities;
+package com.example.pramod.taskplace.Fragments;
 
 import android.annotation.SuppressLint;
 import android.location.Address;
 import android.location.Geocoder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
-import android.widget.Toolbar;
-
-import com.example.pramod.taskplace.Activities.SetTask;
 import com.example.pramod.taskplace.R;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -36,7 +31,7 @@ import java.util.Locale;
 
 import static com.example.pramod.taskplace.R.layout.activity_maps;
 
-public class MapsActivity extends Fragment implements OnMapReadyCallback,GoogleMap.OnMapClickListener{
+public class MapsFragment extends Fragment implements OnMapReadyCallback,GoogleMap.OnMapClickListener{
     SupportPlaceAutocompleteFragment supportPlaceAutocompleteFragment;
     private GoogleMap mMap;
     View view;
@@ -44,6 +39,24 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,GoogleM
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,@Nullable Bundle savedInstanceState) {
         view=inflater.inflate(activity_maps,container,false);
+        //going back to previous page i.e. setTask.class
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
+        view.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if(keyCode==KeyEvent.KEYCODE_BACK && event.getAction()==KeyEvent.ACTION_DOWN){
+                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flContent,new SetTaskFragment()).commit();
+                    Log.i("BACK","going back to setTask()");
+                    return true;
+                }
+                return false;
+            }
+        });
+
+
+
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment)this.getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -103,9 +116,8 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback,GoogleM
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Toast.makeText(getActivity().getApplicationContext(),placeSelected,Toast.LENGTH_SHORT).show();
                 Log.i("lat", String.valueOf(marker.getPosition().latitude));
-                Fragment f=new SetTask();
+                Fragment f=new SetTaskFragment();
                 Bundle b=new Bundle();
                 b.putString("Address",placeSelected);
                 b.putDouble("lat",marker.getPosition().latitude);
