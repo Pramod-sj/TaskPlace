@@ -217,7 +217,7 @@ public class ViewTaskFragment extends Fragment implements SharedPreferences.OnSh
             Location destloc=new Location("");
             currloc.setLatitude(Double.parseDouble(curr[0]));
             currloc.setLongitude(Double.parseDouble(curr[1]));
-            String query="select * from PlaceDatabase";
+            String query="select * from Task";
             Cursor cursor = db.getReadableDatabase().rawQuery(query, null);
             distMeter.clear();
             while(cursor.moveToNext()){

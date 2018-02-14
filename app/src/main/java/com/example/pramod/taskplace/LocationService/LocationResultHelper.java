@@ -158,7 +158,7 @@ class LocationResultHelper {
     public void checkDistanceBetween(Location currLoc){
         DatabaseHelper db=new DatabaseHelper(mContext);
         SQLiteDatabase sql=db.getReadableDatabase();
-        String query="select * from PlaceDatabase";
+        String query="select * from Task";
         Location destloc=new Location("");
         Cursor cursor = sql.rawQuery(query, null);
         SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(mContext);
@@ -185,7 +185,7 @@ class LocationResultHelper {
                 SQLiteDatabase sql = db.getWritableDatabase();
                 FirebaseDatabaseHelper helper=new FirebaseDatabaseHelper(context);
                 helper.removeDatafromFirebase(intent.getStringExtra("task_id"));
-                sql.delete("PlaceDatabase", "task_id=?", new String[]{intent.getStringExtra("task_id")});
+                sql.delete("Task", "task_id=?", new String[]{intent.getStringExtra("task_id")});
                 NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.cancel(Integer.parseInt(intent.getStringExtra("not_id")));
                 LocationRequestHelper.setNotificationFlag(context, true);

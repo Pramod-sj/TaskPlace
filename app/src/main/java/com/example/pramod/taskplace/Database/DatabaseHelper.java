@@ -7,7 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.example.pramod.taskplace.Model.Places;
 import com.example.pramod.taskplace.Model.TaskDetails;
+import com.google.android.gms.location.places.Place;
 
 import java.util.ArrayList;
 
@@ -17,7 +19,7 @@ import java.util.ArrayList;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     static String db_name="TaskPlace.db";
-    static String t_name="PlaceDatabase";
+    static String t_name="Task";
     static String PLACE="place";
     static String LAT="latitude";
     static String LONG="longitude";
@@ -30,6 +32,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("create table "+t_name+"(sr_no INTEGER primary key,task_id varchar(30),"+PLACE+" varchar(50),"+TASK_TITLE+" varchar(20),"+TASK_DESC+" varchar(60),"+DATE_+" varchar(20),"+LAT+" varchar(20),"+LONG+" varchar(20));");
+        db.execSQL("create table Places(id INTEGER primary key,place varchar(100),lat varchar(30),lng varchar(30))");
     }
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
@@ -41,7 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.delete(t_name,null,null);
     }
     public boolean isDataExist(){
-        Cursor cursor=this.getReadableDatabase().rawQuery("select * from PlaceDatabase",null);
+        Cursor cursor=this.getReadableDatabase().rawQuery("select * from Task",null);
         if(cursor.getCount()==0){
             return false;
         }
@@ -61,19 +64,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("latitude", details.getLat());
         values.put("longitude", details.getLng());
         // Inserting Row
-        sql.insert("PlaceDatabase", null, values);
+        sql.insert(t_name, null, values);
         sql.close(); //closing sql connection
         this.close(); // Closing database connection
     }
     public void deteleData(String ids){
         SQLiteDatabase sql=this.getWritableDatabase();
-        sql.delete("PlaceDatabase","task_id=?",new String[]{ids});
+        sql.delete(t_name,"task_id=?",new String[]{ids});
 
     }
     public ArrayList<TaskDetails> fetchData(){
         Log.i("INSIDE fetchData()","fetching data from offline database");
         ArrayList<TaskDetails> details=new ArrayList<>();
-        Cursor cursor=this.getReadableDatabase().rawQuery("select * from PlaceDatabase",null);
+        Cursor cursor=this.getReadableDatabase().rawQuery("select * from "+t_name,null);
         while(cursor.moveToNext()){
             TaskDetails d=new TaskDetails();
             d.setTaskid(cursor.getString(1));
@@ -89,7 +92,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     public TaskDetails getDetailsById(String id){
         //adding by 1 because we are getting their position from list view..ie.start from 0 and so on
-        String query="select * from PlaceDatabase where task_id='"+id+"'";
+        String query="select * from "+t_name+" where task_id='"+id+"'";
         Cursor cursor=this.getReadableDatabase().rawQuery(query,null);
         cursor.moveToNext();
         TaskDetails details=new TaskDetails(cursor.getString(3)
@@ -102,7 +105,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values=new ContentValues();
         values.put(TASK_TITLE,taskTitle);
         values.put(TASK_DESC,taskDesc);
-        int x=this.getWritableDatabase().update(t_name,values,"task_id='"+id+"'",null);
+        this.getWritableDatabase().update(t_name,values,"task_id='"+id+"'",null);
+    }
+    public void insertPlace(String place,double lat,double lng){
+        try {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("place", place);
+            contentValues.put("lat",String.valueOf(lat));
+            contentValues.put("lng",String.valueOf(lng));
+            this.getWritableDatabase().insertOrThrow("Places", null, contentValues);
+        }catch(Exception e){
+            Log.i("insertPlace()","unable to insert place data");
+        }
+    }
+    public void deletePlaceByName(String name){
+        this.getWritableDatabase().delete("Places","place='"+name+"'",null);
+    }
+    public void removeAllPlacedata(){
+        this.getWritableDatabase().delete("Places",null,null);
+    }
+    public ArrayList<Places> getPlaceData(){
+        ArrayList<Places> place=new ArrayList<>();
+        Cursor cursor=this.getReadableDatabase().rawQuery("select * from Places",null);
+        while(cursor.moveToNext()){
+            Places places=new Places(cursor.getInt(0),cursor.getString(1),Double.valueOf(cursor.getString(2)),Double.valueOf(cursor.getString(3)));
+            place.add(places);
+        }
+        return place;
+    }
+    public boolean matchPlaces(String place){
+        Cursor cursor=this.getReadableDatabase().rawQuery("select * from Places",null);
+        while(cursor.moveToNext()){
+            if(cursor.getString(1).equals(place)){
+                return true;
+            }
+        }
+        return false;
     }
 
 }

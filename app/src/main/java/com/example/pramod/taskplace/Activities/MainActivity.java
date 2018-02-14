@@ -35,6 +35,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.pramod.taskplace.LocationService.LocationRequestHelper;
 import com.example.pramod.taskplace.LocationService.LocationUpdatesBroadcastReceiver;
 import com.example.pramod.taskplace.Model.CurrentUserData;
 import com.example.pramod.taskplace.Fragments.NavMapFragment;
@@ -86,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
         storage=FirebaseStorage.getInstance();
         storageReference = storage.getReference();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -124,6 +127,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         String ScrollViewActivity=getIntent().getStringExtra("scrollView");
         if(notifydata!=null){
             if(notifydata.equals("ViewTaskFragment")) {
+                //set flag to true so that to receive message again
+                LocationRequestHelper.setNotificationFlag(MainActivity.this, true);
                 Fragment f = new ViewTaskFragment();
                 getSupportFragmentManager().beginTransaction().replace(R.id.flContent, f).commit();
             }
@@ -331,6 +336,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             @Override
                             public void onResult(@NonNull Status status) {
                                 if(status.isSuccess()){
+                                    TaskPlace.getDatabaseHelper().removeAllPlacedata();
                                     TaskPlace.getDatabaseHelper().removeAlldata();
                                     Intent i=new Intent(MainActivity.this,LoginActivity.class);
                                     i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

@@ -1,7 +1,9 @@
 package com.example.pramod.taskplace.Fragments;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -12,6 +14,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -25,6 +28,7 @@ import com.example.pramod.taskplace.Model.TaskDetails;
 import com.example.pramod.taskplace.TaskPlace;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import es.dmoral.toasty.Toasty;
@@ -41,7 +45,7 @@ public class SetTaskFragment extends Fragment {
     String placeSelected="";
     String taskData="";
     //end
-    //
+    AlertDialog alertDialog;
     TextView txt;
     double lat;
     double lng;
@@ -55,8 +59,8 @@ public class SetTaskFragment extends Fragment {
         txt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment f=new MapsFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flContent,f).commit();
+                //show dialog for selection
+                selectPlaceDialog();
             }
         });
         progressDialog=new ProgressDialog(getActivity());
@@ -134,5 +138,24 @@ public class SetTaskFragment extends Fragment {
         }
         catch(Exception exception) {}
         return isInternetAvailable;
+    }
+    public void selectPlaceDialog(){
+        String list[]={"Saved Place","Select new Place"};
+        ArrayAdapter adapter=new ArrayAdapter(getActivity(),android.R.layout.simple_list_item_1,list);
+        AlertDialog.Builder builder=new AlertDialog.Builder(getActivity())
+                .setAdapter(adapter, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(which==0){
+                            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flContent,new PlaceFragment()).commit();
+                        }else {
+                            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flContent,new MapsFragment()).commit();
+                        }
+                    }
+                })
+                .setCancelable(true)
+                .setTitle("Place");
+        alertDialog=builder.create();
+        alertDialog.show();
     }
 }

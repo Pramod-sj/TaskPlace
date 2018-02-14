@@ -65,7 +65,7 @@ public class FirebaseDatabaseHelper {
     public void insertDataToOffline() {
         DatabaseHelper db=new DatabaseHelper(context);
         SQLiteDatabase sql=db.getWritableDatabase();
-        String query="insert into PlaceDatabase values(null,?,?,?,?,?,?,?)";
+        String query="insert into Task values(null,?,?,?,?,?,?,?)";
         final SQLiteStatement sqLiteStatement=sql.compileStatement(query);
         taskDetailsCloudEndPoint.child(currentUserData.getCurrentUID()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

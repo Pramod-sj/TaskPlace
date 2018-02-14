@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.example.pramod.taskplace.R;
+import com.example.pramod.taskplace.TaskPlace;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
@@ -115,6 +116,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,GoogleM
                     placeSelected= String.valueOf(addresses.get(0).getAddressLine(0));
                 } catch (IOException e) {
                     e.printStackTrace();
+                }
+                if(!placeSelected.equals(null)){
+                    //if matchPlaces(place) returns false then only insert new place...
+                    if(TaskPlace.getDatabaseHelper().matchPlaces(placeSelected)==false) {
+                        TaskPlace.getDatabaseHelper().insertPlace(placeSelected,marker.getPosition().latitude,marker.getPosition().longitude);
+                    }
                 }
                 Log.i("lat", String.valueOf(marker.getPosition().latitude));
                 Fragment f=new SetTaskFragment();
