@@ -8,6 +8,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -62,8 +63,13 @@ public class NavMapFragment extends Fragment implements OnMapReadyCallback,Locat
         locationManager= (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER,10,10,this);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment)this.getChildFragmentManager().findFragmentById(R.id.navmapfragment);
-        mapFragment.getMapAsync(this);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                SupportMapFragment mapFragment = (SupportMapFragment)(NavMapFragment.this).getChildFragmentManager().findFragmentById(R.id.navmapfragment);
+                mapFragment.getMapAsync(NavMapFragment.this);
+            }
+        },300);
         //b=getActivity().findViewById(R.id.directionButton);
         return view;
     }
@@ -78,6 +84,7 @@ public class NavMapFragment extends Fragment implements OnMapReadyCallback,Locat
         mMap=googleMap;
         mMap.setMyLocationEnabled(true);
         mMap.getMyLocation();
+        mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(21.7679,78.8718),4));
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         addMarkers();

@@ -2,42 +2,55 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:id="@+id/cover_header"
     android:layout_height="@dimen/nav_header_height"
     android:gravity="bottom"
-    android:background="@drawable/side_nav_bar"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
-
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/imageView"
-        android:layout_width="90dp"
-        android:layout_height="90dp"
-        android:layout_gravity="center"
-        android:src="@drawable/placeholder"
-        android:layout_marginTop="10dp"
-        app:civ_border_width="2dp"
-        app:civ_border_color="#ffffff"/>
-
-    <TextView
-        android:id="@+id/username"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:layout_marginTop="5dp"
-        android:text="Hello"
-        android:textColor="#ffffff"
-        android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        android:layout_height="match_parent"
+        >
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/cover_image"
+            android:scaleType="fitXY"
+            android:src="@drawable/side_nav_bar"/>
 
-    <TextView
-        android:id="@+id/useremail"
-        android:textAlignment="center"
-        android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:text=""
-        android:textColor="#ffffff"/>
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/imageView"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_above="@+id/username"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:src="@drawable/placeholder"
+            app:civ_border_color="#ffffff"
+            app:civ_border_width="2dp" />
 
+        <TextView
+            android:id="@+id/username"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_above="@+id/useremail"
+            android:layout_alignParentStart="true"
+            android:text="Hello"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="#ffffff" />
+
+        <TextView
+            android:id="@+id/useremail"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="16dp"
+            android:text="World happy"
+            android:textAlignment="center"
+            android:textColor="#ffffff" />
+
+    </RelativeLayout>
 </LinearLayout>

@@ -10,7 +10,7 @@
         android:layout_margin="8dp"
         android:layout_width="match_parent"
         android:layout_height="15dp"
-        android:textSize="20dp"
+        android:textSize="@dimen/text_size"
         android:id="@+id/taskActivator"
         android:visibility="gone"
         android:text="Make my task active"/>

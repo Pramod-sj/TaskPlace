@@ -69,7 +69,7 @@ public class PlaceFragment extends Fragment {
         ArrayList<Places> placesObj=TaskPlace.getDatabaseHelper().getPlaceData();
         for(int i=0;i<placesObj.size();i++){
             places.add(placesObj.get(i).getPlace());
-            latLng.add(new LatLng(placesObj.get(0).getLat(),placesObj.get(0).getLat()));
+            latLng.add(new LatLng(placesObj.get(0).getLat(),placesObj.get(0).getLng()));
         }
     }
     public void selectDialog(final String name,final LatLng latLng){

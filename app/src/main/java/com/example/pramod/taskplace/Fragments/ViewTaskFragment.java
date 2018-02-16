@@ -76,7 +76,8 @@ public class ViewTaskFragment extends Fragment implements SharedPreferences.OnSh
         Log.i("oncreateview","inside it");
         view=inflater.inflate(R.layout.activity_view_task, container, false);
         //getting GoogleApiClient from Application using singleton;
-        getGoogleApiClient();
+        mGoogleApiClient=TaskPlace.getGoogleApiHelper().getGoogleApiClient();
+        mGoogleApiClient.connect();
         db=TaskPlace.getDatabaseHelper();
         pg1=view.findViewById(R.id.loading);
         distMeter=new ArrayList<>();
@@ -92,15 +93,7 @@ public class ViewTaskFragment extends Fragment implements SharedPreferences.OnSh
         listViewListener();
         //inistantiating LocationServiceMethods
         methods=new LocationServiceMethods(getActivity(),mGoogleApiClient);
-
-
-
         return view;
-    }
-    public void getGoogleApiClient(){
-        if(TaskPlace.getGoogleApiHelper().isConnected()){
-            mGoogleApiClient=TaskPlace.getGoogleApiHelper().getGoogleApiClient();
-        }
     }
     public void listViewListener(){
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -171,6 +164,9 @@ public class ViewTaskFragment extends Fragment implements SharedPreferences.OnSh
     public void onResume(){
         Log.i("onresume","inside it");
         super.onResume();
+        if(!TaskPlace.getGoogleApiHelper().isConnected()) {
+            TaskPlace.getGoogleApiHelper().connect();
+        }
         switchState();
     }
     @Override

@@ -23,6 +23,8 @@ import com.example.pramod.taskplace.Activities.Notificationpage;
 import com.example.pramod.taskplace.Database.DatabaseHelper;
 import com.example.pramod.taskplace.Database.FirebaseDatabaseHelper;
 import com.example.pramod.taskplace.R;
+import com.expertprogramming.taskplace.ScrollingActivity;
+
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -131,9 +133,9 @@ class LocationResultHelper {
         actionIntent.putExtra("task_id",task_id);
         actionIntent.putExtra("not_id",sr_no);
         PendingIntent pendingIntent=PendingIntent.getBroadcast(mContext,1,actionIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-        Intent notificationIntent = new Intent(mContext, MainActivity.class);
+        Intent notificationIntent = new Intent(mContext, ScrollingActivity.class);
         notificationIntent.putExtra("task_id",task_id);
-        notificationIntent.putExtra("NotifyPage","ViewTaskFragment");
+        notificationIntent.putExtra("NotifyPage","fromNotif");
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
         stackBuilder.addParentStack(MainActivity.class);
         stackBuilder.addNextIntent(notificationIntent);
@@ -148,7 +150,7 @@ class LocationResultHelper {
         notification.addAction(R.drawable.ic_logout_black_24dp,"MARK AS DONE",pendingIntent);
         notification.setContentIntent(notificationPendingIntent);
         notification.setSound(Uri.parse(url));
-        if(preferences.getBoolean("notifications_new_message_vibrate",false)){
+        if(preferences.getBoolean("notifications_new_message_vibrate",true)){
             notification.setVibrate(new long[]{50,70,100,120});
         }
         notification.setDeleteIntent(swipePendingIntent);

@@ -76,7 +76,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public ArrayList<TaskDetails> fetchData(){
         Log.i("INSIDE fetchData()","fetching data from offline database");
         ArrayList<TaskDetails> details=new ArrayList<>();
-        Cursor cursor=this.getReadableDatabase().rawQuery("select * from "+t_name,null);
+        Cursor cursor=null;
+        cursor = this.getReadableDatabase().rawQuery("select * from " + t_name , null);
         while(cursor.moveToNext()){
             TaskDetails d=new TaskDetails();
             d.setTaskid(cursor.getString(1));

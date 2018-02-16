@@ -9,6 +9,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.transition.Scene;
@@ -16,12 +17,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.pramod.taskplace.Activities.MainActivity;
 import com.example.pramod.taskplace.Database.FirebaseDatabaseHelper;
+import com.example.pramod.taskplace.Fragments.ViewTaskFragment;
+import com.example.pramod.taskplace.LocationService.LocationRequestHelper;
 import com.example.pramod.taskplace.Model.TaskDetails;
 import com.example.pramod.taskplace.R;
 import com.example.pramod.taskplace.TaskPlace;
@@ -36,14 +40,30 @@ public class ScrollingActivity extends AppCompatActivity {
     EditText edt1,edt2;
     AlertDialog alertUpdate,alertDelete;
     String firebaseDataId;
-
+    Button b1;
+    FloatingActionButton fab;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        firebaseDataId=getIntent().getExtras().getString("id");
+        setContentView(R.layout.activity_scrolling);
+        LocationRequestHelper.setNotificationFlag(this,true);
+        fab = (FloatingActionButton)findViewById(R.id.fab);
+        String page=getIntent().getStringExtra("NotifyPage");
+        b1=findViewById(R.id.deleteButton);
+        if(page!=null) {
+            if (page.equals("fromNotif")) {
+                firebaseDataId = getIntent().getStringExtra("task_id");
+                b1.setVisibility(View.VISIBLE);
+                fab.setVisibility(View.GONE);
+            }
+        }
+        else{
+            firebaseDataId=getIntent().getExtras().getString("id");
+            fab.setVisibility(View.VISIBLE);
+            b1.setVisibility(View.GONE);
+        }
         details= TaskPlace.getDatabaseHelper().getDetailsById(firebaseDataId);
         setTitle(details.getTaskTitle());
-        setContentView(R.layout.activity_scrolling);
         firebaseDataId=details.getTaskid();
         taskDESC=findViewById(R.id.TaskDescTextView);
         taskDATE=findViewById(R.id.TaskDateTextView);
@@ -53,12 +73,17 @@ public class ScrollingActivity extends AppCompatActivity {
         taskDATE.setText(details.getTaskdate());
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 deleteOrEdit();
 
+            }
+        });
+        b1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                doneTask();
             }
         });
     }
@@ -96,6 +121,7 @@ public class ScrollingActivity extends AppCompatActivity {
         alertUpdate=builder.create();
         alertUpdate.setView(view);
         alertUpdate.show();
+
     }
     public boolean isConnected_custom(){
         boolean isInternetAvailable = false;
@@ -138,5 +164,33 @@ public class ScrollingActivity extends AppCompatActivity {
         alertDelete=builderDelete.create();
         alertDelete.show();
     }
+    public void doneTask(){
+        AlertDialog.Builder builder=new AlertDialog.Builder(ScrollingActivity.this)
+                .setTitle("Remove Task")
+                .setMessage("do you want to remove this task")
+                .setPositiveButton("remove", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(isConnected_custom()) {
+                            TaskPlace.getDatabaseHelper().deteleData(firebaseDataId);
+                            FirebaseDatabaseHelper helper = new FirebaseDatabaseHelper(ScrollingActivity.this);
+                            helper.removeDatafromFirebase(firebaseDataId);
+                        }else{
+                            Toasty.warning(getApplicationContext(),"We need Internet", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setCancelable(false);
+        builder.create();
+        builder.show();
+
+    }
+
 
 }

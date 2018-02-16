@@ -1,22 +1,18 @@
 package com.example.pramod.taskplace.Activities;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.LocationManager;
-import android.net.Network;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -32,11 +28,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.pramod.taskplace.LocationService.LocationRequestHelper;
-import com.example.pramod.taskplace.LocationService.LocationUpdatesBroadcastReceiver;
 import com.example.pramod.taskplace.Model.CurrentUserData;
 import com.example.pramod.taskplace.Fragments.NavMapFragment;
 import com.example.pramod.taskplace.Fragments.SetTaskFragment;
@@ -66,29 +61,30 @@ import com.squareup.picasso.Picasso;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Calendar;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    CircleImageView circleImageView;
-    View header;
-    Uri ImagePATH;
-    final int SELECT_PHOTO=100;
-    AlertDialog alertDialog;
-    GoogleApiClient mGoogleApiClient;
-
-    TextView username,useremail;
+    private CircleImageView circleImageView;
+    private View header;
+    private Uri ImagePATH;
+    private final int ALARM_ID=10;
+    private final int SELECT_PHOTO=100;
+    private AlertDialog alertDialog;
+    private GoogleApiClient mGoogleApiClient;
+    private AlarmManager alarmManager=null;
+    private PendingIntent pendingIntent=null;
+    private TextView username,useremail;
     //Firebase
-    FirebaseStorage storage;
-    StorageReference storageReference;
+    private FirebaseStorage storage;
+    private StorageReference storageReference;
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
         storage=FirebaseStorage.getInstance();
         storageReference = storage.getReference();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -123,16 +119,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         useremail=header.findViewById(R.id.useremail);
         setUserProfile();
         //for notification
-        String notifydata=getIntent().getStringExtra("NotifyPage");
+        mGoogleApiClient=TaskPlace.getGoogleApiHelper().getGoogleApiClient();
+        mGoogleApiClient.connect();
         String ScrollViewActivity=getIntent().getStringExtra("scrollView");
-        if(notifydata!=null){
-            if(notifydata.equals("ViewTaskFragment")) {
-                //set flag to true so that to receive message again
-                LocationRequestHelper.setNotificationFlag(MainActivity.this, true);
-                Fragment f = new ViewTaskFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.flContent, f).commit();
-            }
-        }else if(ScrollViewActivity!=null){
+        if(ScrollViewActivity!=null){
             if(ScrollViewActivity.equals("scrollView")){
                 Fragment f = new ViewTaskFragment();
                 getSupportFragmentManager().beginTransaction().replace(R.id.flContent, f).commit();
@@ -173,9 +163,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(!checkPermissions()){
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_PERMISSIONS_REQUEST_CODE);
         }
-        if(TaskPlace.getGoogleApiHelper().isConnected()){
-            mGoogleApiClient=TaskPlace.getGoogleApiHelper().getGoogleApiClient();
-        }
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                coverImage();
+            }
+        },200);
     }
     public void setUserProfile(){
         Uri url=FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl();
@@ -201,18 +194,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
     protected void onResume(){
         super.onResume();
-        if(mGoogleApiClient.isConnected()) {
-            locationPermissionChecker(mGoogleApiClient, MainActivity.this);
-        }
     }
     @Override
     public void onStart() {
         super.onStart();
+        TaskPlace.getGoogleApiHelper().connect();
+        if(mGoogleApiClient.isConnected()) {
+            locationPermissionChecker(mGoogleApiClient, MainActivity.this);
+        }
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onDestroy() {
+
+        TaskPlace.getGoogleApiHelper().disconnect();
+        if(alarmManager!=null) {
+            alarmManager.cancel(pendingIntent);
+        }
+        super.onDestroy();
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
@@ -241,6 +240,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         Toasty.error(getApplicationContext(),"This application requires prompted permission",Toast.LENGTH_SHORT).show();
 
                 }
+                break;
+            /*case ALARM_ID:
+                checkTime();
+                break;*/
         }
     }
 
@@ -324,7 +327,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fragment=new NavMapFragment();
             getSupportFragmentManager().beginTransaction().replace(R.id.flContent, fragment).commit();
         }
-
         else if(id==R.id.nav_logout){
             final GoogleApiClient mAuthGoogleApiClient=buildGoogleApiClientAuth();
             mAuthGoogleApiClient.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
@@ -448,5 +450,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mGoogleApiClient.connect();
         return mGoogleApiClient;
     }
-
+    /*public void coverImage(){
+        alarmManager= (AlarmManager) getSystemService(ALARM_SERVICE);
+        pendingIntent=createPendingResult(ALARM_ID,new Intent(),0);
+        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime()+10000,10000,pendingIntent);
+    }*/
+    public void coverImage(){
+        ImageView img=findViewById(R.id.cover_image);
+        Calendar calendar=Calendar.getInstance();
+        int hour=calendar.get(Calendar.HOUR_OF_DAY);
+        if(hour>=0 && hour<12){
+            img.setImageDrawable(getResources().getDrawable(R.drawable.morn_min));
+            Log.i("test","GOOD MORNING");
+        }else if(hour>=12 && hour<16){
+            img.setImageDrawable(getResources().getDrawable(R.drawable.after_min));
+            Log.i("test","GOOD Afternoon");
+        }else if(hour>=16 && hour<21){
+            img.setImageDrawable(getResources().getDrawable(R.drawable.eve_min));
+            Log.i("test","GOOD evening");
+            username.setTextColor(Color.WHITE);
+            useremail.setTextColor(Color.WHITE);
+        }else if(hour>=21 && hour<24){
+            img.setImageDrawable(getResources().getDrawable(R.drawable.night_min));
+            username.setTextColor(Color.WHITE);
+            useremail.setTextColor(Color.WHITE);
+            Log.i("test","GOOD night");
+        }
+    }
 }
