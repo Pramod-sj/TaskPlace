@@ -32,4 +32,9 @@ public class AboutActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    protected void onStop(){
+        super.onStop();
+        finish();
+    }
 }

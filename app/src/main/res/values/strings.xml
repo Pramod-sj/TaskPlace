@@ -2,8 +2,8 @@
     <string name="app_name">TaskPlace</string>
     <string name="apikey">AIzaSyAg4vdxuQp5yUmNrMhQtrUhdtAOr9b7KIU</string>
     <string name="web_client_id">810303124847-v10ouqpqqodiljch9r5l426mc8muro6u.apps.googleusercontent.com</string>
-    <string name="login">Already have account,Login me..!</string>
-    <string name="register">Create an account</string>
+    <string name="login"><ul>Already have an account, login me..!</ul></string>
+    <string name="register"><ul>Create an account....</ul></string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="devOption">Developers</string>

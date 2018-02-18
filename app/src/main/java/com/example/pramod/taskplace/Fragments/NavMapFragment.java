@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.pramod.taskplace.Database.DatabaseHelper;
+import com.example.pramod.taskplace.LocationService.LocationRequestHelper;
 import com.example.pramod.taskplace.Model.CurrentUserData;
 import com.example.pramod.taskplace.R;
 import com.example.pramod.taskplace.Model.TaskDetails;
@@ -55,6 +57,7 @@ public class NavMapFragment extends Fragment implements OnMapReadyCallback,Locat
     LocationManager locationManager;
     GoogleMap mMap;
     Button b;
+    Snackbar snackbar=null;
     @SuppressLint("MissingPermission")
     public View onCreateView(LayoutInflater inflater, ViewGroup conatainer, Bundle b){
         view=inflater.inflate(R.layout.activity_navmapfragment,conatainer,false);
@@ -92,12 +95,26 @@ public class NavMapFragment extends Fragment implements OnMapReadyCallback,Locat
     public void addMarkers(){
         SharedPreferences sharedPreferences= PreferenceManager.getDefaultSharedPreferences(getActivity());
         DatabaseHelper db=new DatabaseHelper(getActivity());
-        for (TaskDetails details:db.fetchData()){
-            latLng=new LatLng(Double.valueOf(details.getLat()),Double.valueOf(details.getLng()));
-            mMap.addMarker(new MarkerOptions().position(latLng).title(details.getPlace()).snippet(details.getTaskTitle()));
-            mMap.addCircle(new CircleOptions().center(latLng).radius(Integer.parseInt(sharedPreferences.getString("radius","100"))).fillColor(0x220000FF).strokeColor(Color.BLUE).strokeWidth(1));
-            destlat.add(Double.valueOf(details.getLat()));
-            destlng.add(Double.valueOf(details.getLng()));
+        //if requesting trigger is false then only add marker on map
+        if (LocationRequestHelper.getRequestingTrigger(getActivity()) == false) {
+            for (TaskDetails details : db.fetchData()) {
+                latLng = new LatLng(Double.valueOf(details.getLat()), Double.valueOf(details.getLng()));
+                mMap.addMarker(new MarkerOptions().position(latLng).title(details.getPlace()).snippet(details.getTaskTitle()));
+                mMap.addCircle(new CircleOptions().center(latLng).radius(Integer.parseInt(sharedPreferences.getString("radius", "100"))).fillColor(0x220000FF).strokeColor(Color.BLUE).strokeWidth(1));
+                destlat.add(Double.valueOf(details.getLat()));
+                destlng.add(Double.valueOf(details.getLng()));
+            }
+        }else{
+            snackbar=Snackbar.make(getActivity().findViewById(R.id.linearnavmap),"first enable your task..",Snackbar.LENGTH_INDEFINITE).setAction("Activate"
+                    , new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Fragment fragment=new ViewTaskFragment();
+                            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flContent,fragment).commit();
+                        }
+                    });
+            snackbar.show();
+
         }
     }
     public GeoApiContext getGeoApiContext(){
@@ -152,6 +169,13 @@ public class NavMapFragment extends Fragment implements OnMapReadyCallback,Locat
 
     @Override
     public void onProviderDisabled(String provider) {
+
+    }
+    public void onDestroy(){
+        if(snackbar!=null){
+            snackbar.dismiss();
+        }
+        super.onDestroy();
 
     }
 }

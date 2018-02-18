@@ -1,18 +1,13 @@
 package com.example.pramod.taskplace.Fragments;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.location.Location;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -29,10 +24,8 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.pramod.taskplace.Adapters.TaskViewAdapter;
-import com.example.pramod.taskplace.Database.FirebaseDatabaseHelper;
 import com.example.pramod.taskplace.LocationService.LocationRequestHelper;
 import com.example.pramod.taskplace.LocationService.LocationServiceMethods;
 import com.example.pramod.taskplace.Model.CurrentUserData;
@@ -40,14 +33,12 @@ import com.example.pramod.taskplace.Database.DatabaseHelper;
 import com.example.pramod.taskplace.R;
 import com.example.pramod.taskplace.Model.TaskDetails;
 import com.example.pramod.taskplace.TaskPlace;
-import com.expertprogramming.taskplace.ScrollingActivity;
+import com.example.pramod.taskplace.ScrollingActivity;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
-
-import es.dmoral.toasty.Toasty;
 
 public class ViewTaskFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener{
     ArrayList<String> distMeter;

@@ -60,4 +60,9 @@ public class OpenLibraries_Activity extends AppCompatActivity {
             }
         });
     }
+
+    protected void onStop(){
+        super.onStop();
+        finish();
+    }
 }

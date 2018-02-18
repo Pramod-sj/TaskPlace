@@ -1,17 +1,22 @@
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/navmapfragment"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:name="com.google.android.gms.maps.SupportMapFragment">
-    <Button
-        android:id="@+id/directionButton"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:padding="10dp"
-        android:text="Direction"
-        android:paddingRight="10dp"
-        android:paddingBottom="10dp"
-        />
-</fragment>
+    android:id="@+id/linearnavmap">
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/navmapfragment"
+        android:name="com.google.android.gms.maps.SupportMapFragment">
+        <Button
+            android:id="@+id/directionButton"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:padding="10dp"
+            android:text="Direction"
+            android:paddingRight="10dp"
+            android:paddingBottom="10dp"
+            />
+    </fragment>
+</LinearLayout>

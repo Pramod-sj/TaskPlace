@@ -1,4 +1,4 @@
-package com.expertprogramming.taskplace;
+package com.example.pramod.taskplace;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -8,13 +8,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.transition.Scene;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -24,13 +20,8 @@ import android.widget.Toast;
 
 import com.example.pramod.taskplace.Activities.MainActivity;
 import com.example.pramod.taskplace.Database.FirebaseDatabaseHelper;
-import com.example.pramod.taskplace.Fragments.ViewTaskFragment;
 import com.example.pramod.taskplace.LocationService.LocationRequestHelper;
 import com.example.pramod.taskplace.Model.TaskDetails;
-import com.example.pramod.taskplace.R;
-import com.example.pramod.taskplace.TaskPlace;
-
-import java.util.ArrayList;
 
 import es.dmoral.toasty.Toasty;
 
@@ -94,8 +85,8 @@ public class ScrollingActivity extends AppCompatActivity {
         edt1.setText(details.getTaskTitle());
         edt2.setText(details.getTaskDesc());
         AlertDialog.Builder builder=new AlertDialog.Builder(ScrollingActivity.this);
-        builder.setTitle("Operation")
-                .setMessage("Delete Or Update your task")
+        builder.setTitle("Update Task")
+                .setMessage("Do you really want to update")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -175,6 +166,11 @@ public class ScrollingActivity extends AppCompatActivity {
                             TaskPlace.getDatabaseHelper().deteleData(firebaseDataId);
                             FirebaseDatabaseHelper helper = new FirebaseDatabaseHelper(ScrollingActivity.this);
                             helper.removeDatafromFirebase(firebaseDataId);
+                            Toasty.success(ScrollingActivity.this,"Successfully deleted",Toast.LENGTH_SHORT).show();
+                            Intent i=new Intent(ScrollingActivity.this, MainActivity.class);
+                            i.putExtra("scrollView","scrollView");
+                            startActivity(i);
+                            finish();
                         }else{
                             Toasty.warning(getApplicationContext(),"We need Internet", Toast.LENGTH_SHORT).show();
                         }

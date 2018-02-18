@@ -17,7 +17,7 @@ public class DevPageActivity extends AppCompatActivity{
     RecyclerView recyclerView;
     final String[] devemails={"pramodsinghjantwal@gmail.com","ashishkokane1605@gmail.com","abhishek.as208@gmail.com"};
     final String devnames[]={"Pramod SJ","Ashish K","Abhishek S"};
-    final String devStatus[]={"Lead Developer\nUI/UX Designer","Developer","Logo Designer\nDeveloper"};
+    final String devStatus[]={"Lead Developer","Developer","Logo Designer"};
     private final String devdp[] = {
             "https://github.com/Pramod-sj/TaskPlace/raw/master/DevDP/pramod.jpg",
             "https://github.com/Pramod-sj/TaskPlace/raw/master/DevDP/ashish.jpg",
@@ -36,5 +36,9 @@ public class DevPageActivity extends AppCompatActivity{
         recyclerView.setLayoutManager(layoutManager);
         DevAdapter adapter=new DevAdapter(this,devnames,devemails,devdp,devStatus);
         recyclerView.setAdapter(adapter);
+    }
+    protected void onStop(){
+        super.onStop();
+        finish();
     }
 }

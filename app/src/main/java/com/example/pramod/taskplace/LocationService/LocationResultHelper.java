@@ -11,19 +11,15 @@ import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
-import android.service.notification.StatusBarNotification;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.app.NotificationChannel;
-import android.util.Log;
-import com.example.pramod.taskplace.Activities.MainActivity;
-import com.example.pramod.taskplace.Activities.Notificationpage;
+
 import com.example.pramod.taskplace.Database.DatabaseHelper;
-import com.example.pramod.taskplace.Database.FirebaseDatabaseHelper;
 import com.example.pramod.taskplace.R;
-import com.expertprogramming.taskplace.ScrollingActivity;
+import com.example.pramod.taskplace.ScrollingActivity;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -120,26 +116,24 @@ class LocationResultHelper {
             channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
             getNotificationManager().createNotificationChannel(channel);
         }
-
         //Intent i=new Intent(mContext,LocationUpdatesBroadcastReceiver.class);
         //PendingIntent broadIntent=PendingIntent.getBroadcast(mContext,0,i,0);
         //swipe delete
         Intent swipeActionIntent=new Intent(mContext,SwipeActionEvent.class);
         PendingIntent swipePendingIntent=PendingIntent.getBroadcast(mContext,1,swipeActionIntent,PendingIntent.FLAG_UPDATE_CURRENT);
         //end of swipe delete
-
-        Intent actionIntent=new Intent(mContext,ActionEvent.class);
-        Log.i("not_id",task_id);
-        actionIntent.putExtra("task_id",task_id);
-        actionIntent.putExtra("not_id",sr_no);
-        PendingIntent pendingIntent=PendingIntent.getBroadcast(mContext,1,actionIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        //Intent actionIntent=new Intent(mContext,ActionEvent.class);
+        //actionIntent.putExtra("task_id",task_id);
+        //actionIntent.putExtra("not_id",sr_no);
+        //PendingIntent pendingIntent=PendingIntent.getBroadcast(mContext,1,actionIntent,PendingIntent.FLAG_UPDATE_CURRENT);
         Intent notificationIntent = new Intent(mContext, ScrollingActivity.class);
         notificationIntent.putExtra("task_id",task_id);
         notificationIntent.putExtra("NotifyPage","fromNotif");
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
-        stackBuilder.addParentStack(MainActivity.class);
-        stackBuilder.addNextIntent(notificationIntent);
-        PendingIntent notificationPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent notificationPendingIntent=PendingIntent.getActivity(mContext,1,notificationIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        //TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
+        //stackBuilder.addParentStack(MainActivity.class);
+        //stackBuilder.addNextIntent(notificationIntent);
+        //PendingIntent notificationPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
         SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(mContext);
         String url=preferences.getString("notifications_new_message_ringtone","content://settings/system/notification_sound");
         NotificationCompat.Builder notification = new NotificationCompat.Builder(mContext,PRIMARY_CHANNEL);
@@ -147,14 +141,15 @@ class LocationResultHelper {
         notification.setContentTitle(place);
         notification.setContentText(tasktitle);
         notification.setAutoCancel(true);
-        notification.addAction(R.drawable.ic_logout_black_24dp,"MARK AS DONE",pendingIntent);
+        //notification.addAction(R.drawable.ic_logout_black_24dp,"MARK AS DONE",pendingIntent);
         notification.setContentIntent(notificationPendingIntent);
         notification.setSound(Uri.parse(url));
         if(preferences.getBoolean("notifications_new_message_vibrate",true)){
-            notification.setVibrate(new long[]{50,70,100,120});
+            notification.setVibrate(new long[]{50,120,200,300});
         }
         notification.setDeleteIntent(swipePendingIntent);
         getNotificationManager().notify(Integer.parseInt(sr_no),notification.build());
+        wakeUp();
     }
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void checkDistanceBetween(Location currLoc){
@@ -180,19 +175,19 @@ class LocationResultHelper {
         }
 
     }
-    public static class ActionEvent extends BroadcastReceiver{
-        @Override
-        public void onReceive(Context context, Intent intent) {
-                DatabaseHelper db = new DatabaseHelper(context);
-                SQLiteDatabase sql = db.getWritableDatabase();
-                FirebaseDatabaseHelper helper=new FirebaseDatabaseHelper(context);
-                helper.removeDatafromFirebase(intent.getStringExtra("task_id"));
-                sql.delete("Task", "task_id=?", new String[]{intent.getStringExtra("task_id")});
-                NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.cancel(Integer.parseInt(intent.getStringExtra("not_id")));
-                LocationRequestHelper.setNotificationFlag(context, true);
-        }
-    }
+    //public static class ActionEvent extends BroadcastReceiver{
+    //    @Override
+    //    public void onReceive(Context context, Intent intent) {
+    //            DatabaseHelper db = new DatabaseHelper(context);
+    //            SQLiteDatabase sql = db.getWritableDatabase();
+    //            FirebaseDatabaseHelper helper=new FirebaseDatabaseHelper(context);
+    //helper.removeDatafromFirebase(intent.getStringExtra("task_id"));
+    //            sql.delete("Task", "task_id=?", new String[]{intent.getStringExtra("task_id")});
+    //            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+     //           notificationManager.cancel(Integer.parseInt(intent.getStringExtra("not_id")));
+     //           LocationRequestHelper.setNotificationFlag(context, true);
+     //   }
+    //}
     public static class SwipeActionEvent extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -200,6 +195,15 @@ class LocationResultHelper {
             LocationRequestHelper.setNotificationFlag(context, true);
         }
 
+    }
+    public void wakeUp(){
+        PowerManager powerManager= (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+        if(!powerManager.isScreenOn()){
+            PowerManager.WakeLock wl = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK |PowerManager.ACQUIRE_CAUSES_WAKEUP |PowerManager.ON_AFTER_RELEASE,"MyLock");
+            wl.acquire(10000);
+            PowerManager.WakeLock wl_cpu = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"MyCpuLock");
+            wl_cpu.acquire(10000);
+        }
     }
 
 }

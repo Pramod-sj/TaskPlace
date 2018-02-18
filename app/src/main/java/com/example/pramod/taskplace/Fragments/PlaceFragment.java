@@ -1,9 +1,13 @@
 package com.example.pramod.taskplace.Fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -32,6 +36,8 @@ import java.util.ArrayList;
 
 public class PlaceFragment extends Fragment {
     View view;
+    Snackbar snackbar;
+    Context context;
     ArrayList<String> places=new ArrayList<>();
     PlaceAdapter adapter;
     ArrayList<LatLng> latLng=new ArrayList<>();
@@ -66,10 +72,27 @@ public class PlaceFragment extends Fragment {
         return view;
     }
     public void getPlaces(){
+        boolean flag=false;
         ArrayList<Places> placesObj=TaskPlace.getDatabaseHelper().getPlaceData();
         for(int i=0;i<placesObj.size();i++){
+            flag=true;
             places.add(placesObj.get(i).getPlace());
             latLng.add(new LatLng(placesObj.get(0).getLat(),placesObj.get(0).getLng()));
+        }
+        if(!flag){
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    snackbar=Snackbar.make(getActivity().findViewById(R.id.linearSavedPlace),"No Saved place",Snackbar.LENGTH_INDEFINITE)
+                            .setAction("Select place", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flContent,new MapsFragment()).commit();
+                                }
+                            });
+                    snackbar.show();
+                }
+            },200);
         }
     }
     public void selectDialog(final String name,final LatLng latLng){
@@ -97,5 +120,12 @@ public class PlaceFragment extends Fragment {
                 });
         builder.create();
         builder.show();
+    }
+    public void onDestroy(){
+        if(snackbar!=null){
+            snackbar.dismiss();
+        }
+        super.onDestroy();
+
     }
 }

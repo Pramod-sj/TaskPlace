@@ -246,19 +246,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;*/
         }
     }
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-            finish();
-            System.exit(0);
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -338,7 +325,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             @Override
                             public void onResult(@NonNull Status status) {
                                 if(status.isSuccess()){
-                                    TaskPlace.getDatabaseHelper().removeAllPlacedata();
                                     TaskPlace.getDatabaseHelper().removeAlldata();
                                     Intent i=new Intent(MainActivity.this,LoginActivity.class);
                                     i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -463,7 +449,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             img.setImageDrawable(getResources().getDrawable(R.drawable.morn_min));
             Log.i("test","GOOD MORNING");
         }else if(hour>=12 && hour<16){
-            img.setImageDrawable(getResources().getDrawable(R.drawable.after_min));
             Log.i("test","GOOD Afternoon");
         }else if(hour>=16 && hour<21){
             img.setImageDrawable(getResources().getDrawable(R.drawable.eve_min));
@@ -471,9 +456,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             username.setTextColor(Color.WHITE);
             useremail.setTextColor(Color.WHITE);
         }else if(hour>=21 && hour<24){
-            img.setImageDrawable(getResources().getDrawable(R.drawable.night_min));
-            username.setTextColor(Color.WHITE);
-            useremail.setTextColor(Color.WHITE);
             Log.i("test","GOOD night");
         }
     }

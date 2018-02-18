@@ -169,5 +169,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         */
     }
 
+    protected void onStop(){
+        super.onStop();
+        finish();
+    }
 
 }
