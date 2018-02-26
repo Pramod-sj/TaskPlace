@@ -33,7 +33,7 @@ import com.example.pramod.taskplace.Database.DatabaseHelper;
 import com.example.pramod.taskplace.R;
 import com.example.pramod.taskplace.Model.TaskDetails;
 import com.example.pramod.taskplace.TaskPlace;
-import com.example.pramod.taskplace.ScrollingActivity;
+import com.example.pramod.taskplace.Activities.ScrollingActivity;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;

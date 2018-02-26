@@ -68,7 +68,6 @@ public class PlaceFragment extends Fragment {
                 selectDialog(places.get(position),latLng.get(position));
             }
         });
-
         return view;
     }
     public void getPlaces(){
@@ -77,7 +76,7 @@ public class PlaceFragment extends Fragment {
         for(int i=0;i<placesObj.size();i++){
             flag=true;
             places.add(placesObj.get(i).getPlace());
-            latLng.add(new LatLng(placesObj.get(0).getLat(),placesObj.get(0).getLng()));
+            latLng.add(new LatLng(placesObj.get(i).getLat(),placesObj.get(i).getLng()));
         }
         if(!flag){
             new Handler().postDelayed(new Runnable() {

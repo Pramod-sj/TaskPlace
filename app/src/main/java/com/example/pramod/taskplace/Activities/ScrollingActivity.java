@@ -1,4 +1,4 @@
-package com.example.pramod.taskplace;
+package com.example.pramod.taskplace.Activities;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -18,10 +18,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.pramod.taskplace.Activities.MainActivity;
 import com.example.pramod.taskplace.Database.FirebaseDatabaseHelper;
 import com.example.pramod.taskplace.LocationService.LocationRequestHelper;
 import com.example.pramod.taskplace.Model.TaskDetails;
+import com.example.pramod.taskplace.R;
+import com.example.pramod.taskplace.TaskPlace;
 
 import es.dmoral.toasty.Toasty;
 

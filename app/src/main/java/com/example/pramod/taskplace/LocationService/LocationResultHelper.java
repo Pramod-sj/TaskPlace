@@ -19,7 +19,7 @@ import android.app.NotificationChannel;
 
 import com.example.pramod.taskplace.Database.DatabaseHelper;
 import com.example.pramod.taskplace.R;
-import com.example.pramod.taskplace.ScrollingActivity;
+import com.example.pramod.taskplace.Activities.ScrollingActivity;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -137,7 +137,7 @@ class LocationResultHelper {
         SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(mContext);
         String url=preferences.getString("notifications_new_message_ringtone","content://settings/system/notification_sound");
         NotificationCompat.Builder notification = new NotificationCompat.Builder(mContext,PRIMARY_CHANNEL);
-        notification.setSmallIcon(R.mipmap.ic_launcher);
+        notification.setSmallIcon(R.mipmap.adaptive_ic_launcher_foreground);
         notification.setContentTitle(place);
         notification.setContentText(tasktitle);
         notification.setAutoCancel(true);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/linearnavmap">
@@ -8,15 +8,27 @@
         android:layout_height="match_parent"
         android:id="@+id/navmapfragment"
         android:name="com.google.android.gms.maps.SupportMapFragment">
+    </fragment>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_margin="10dp">
         <Button
-            android:id="@+id/directionButton"
+            android:id="@+id/stopdirectionButton"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:padding="10dp"
-            android:text="Direction"
-            android:paddingRight="10dp"
-            android:paddingBottom="10dp"
-            />
-    </fragment>
-</LinearLayout>
+            android:text="Stop Direction"
+            android:layout_weight="1"
+            android:layout_gravity="bottom"/>
+
+        <Button
+            android:id="@+id/startdirectionButton"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Start Direction"
+            android:layout_weight="1"
+            android:layout_gravity="bottom"/>
+    </LinearLayout>
+</RelativeLayout>

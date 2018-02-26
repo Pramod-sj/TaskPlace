@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:androidtools="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.pramod.taskplace">
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CLEAR_APP_CACHE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
     <application
         android:name=".TaskPlace"
+        android:allowClearUserData="true"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:icon="@mipmap/adaptive_ic_launcher"
+        android:roundIcon="@mipmap/adaptive_ic_launcher_round"
         android:supportsRtl="true"
         android:hardwareAccelerated="true"
         android:theme="@style/AppTheme">
@@ -24,7 +25,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAg4vdxuQp5yUmNrMhQtrUhdtAOr9b7KIU" />
 
-        <receiver android:name=".LocationService.LocationResultHelper$ActionEvent" />
+        <!--<receiver android:name=".LocationService.LocationResultHelper$ActionEvent" />-->
         <receiver android:name=".LocationService.LocationResultHelper$SwipeActionEvent" />
 
         <activity android:name=".Activities.LoginActivity" />
@@ -79,7 +80,7 @@
         </receiver>
 
         <activity
-            android:name=".ScrollingActivity"
+            android:name=".Activities.ScrollingActivity"
             android:label="@string/title_activity_scrolling"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>

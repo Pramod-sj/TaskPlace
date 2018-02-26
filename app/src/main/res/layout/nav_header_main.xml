@@ -16,7 +16,7 @@
             android:layout_height="match_parent"
             android:id="@+id/cover_image"
             android:scaleType="fitXY"
-            android:src="@drawable/side_nav_bar"/>
+            android:src="@drawable/eve_min"/>
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/imageView"

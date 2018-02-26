@@ -6,4 +6,5 @@
     <color name="orange">#FF8C00</color>
     <color name="darkOrange">#EF6C00</color>
     <color name="purple">#6A1B9A</color>
+    <color name="textColor">#ffffff</color>
 </resources>

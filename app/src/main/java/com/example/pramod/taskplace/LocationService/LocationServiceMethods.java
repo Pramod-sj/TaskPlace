@@ -45,34 +45,11 @@ public class LocationServiceMethods {
         this.context=context;
         this.lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
     }
-    public void checkProvider(){
-        if(!lm.isProviderEnabled(LocationManager.GPS_PROVIDER) && !lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
-            Toasty.error(context, "There is no way to get location", Toast.LENGTH_SHORT).show();
-        }
-        else {
-            if(lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-
-            }
-            else{
-                Toasty.warning(context, "App may not work properly", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-    public int getLocationMode() {
-        try {
-            return Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE);
-        } catch (Settings.SettingNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        return 0;
-    }
     public void createLocationRequest(){
         locationRequest=new LocationRequest();
         locationRequest.setInterval(10000);
         locationRequest.setFastestInterval(5000);
         SharedPreferences pref= PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor=pref.edit();
         if(pref.getBoolean("mode",false)==true){
             locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         }
@@ -80,8 +57,6 @@ public class LocationServiceMethods {
             locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         }
     }
-
-
     /**
      * Handles the Request Updates button and requests start of location updates.
      */
@@ -109,5 +84,4 @@ public class LocationServiceMethods {
         intent.setAction(LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES);
         return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
-
 }

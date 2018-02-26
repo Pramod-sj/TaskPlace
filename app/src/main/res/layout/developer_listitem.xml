@@ -4,14 +4,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/devImageProfile"
         android:layout_width="110dp"
         android:layout_height="110dp"
-        app:civ_border_width="2dp"
-        app:civ_border_color="@color/colorPrimaryDark"
+        app:civ_border_width="3dp"
+        app:civ_border_color="@color/colorAccent"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="45dp"
         android:elevation="8dp" />
@@ -19,7 +18,7 @@
         android:id="@+id/profileCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="4dp"
+        app:cardCornerRadius="6dp"
         app:cardElevation="4dp"
         android:layout_margin="8sp"
         app:cardUseCompatPadding="false">
@@ -27,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="95dp"
             android:orientation="horizontal"
-            android:background="@drawable/cardbg">
+            android:background="@drawable/grey">
             <TextView
                 android:id="@+id/devStatus"
                 android:layout_width="wrap_content"

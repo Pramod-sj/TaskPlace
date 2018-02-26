@@ -77,6 +77,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private AlarmManager alarmManager=null;
     private PendingIntent pendingIntent=null;
     private TextView username,useremail;
+    float time_backPressed;
+    private static int backpressedCount=0;
+
     //Firebase
     private FirebaseStorage storage;
     private StorageReference storageReference;
@@ -163,12 +166,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(!checkPermissions()){
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_PERMISSIONS_REQUEST_CODE);
         }
-        new Handler().postDelayed(new Runnable() {
+        /*new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 coverImage();
             }
-        },200);
+        },200);*/
     }
     public void setUserProfile(){
         Uri url=FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl();
@@ -194,6 +197,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
     protected void onResume(){
         super.onResume();
+        time_backPressed=0;
+        backpressedCount=0;
+
     }
     @Override
     public void onStart() {
@@ -315,32 +321,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             getSupportFragmentManager().beginTransaction().replace(R.id.flContent, fragment).commit();
         }
         else if(id==R.id.nav_logout){
-            final GoogleApiClient mAuthGoogleApiClient=buildGoogleApiClientAuth();
-            mAuthGoogleApiClient.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-                @Override
-                public void onConnected(@Nullable Bundle bundle) {
-                    FirebaseAuth.getInstance().signOut();
-                    if(mAuthGoogleApiClient.isConnected()){
-                        Auth.GoogleSignInApi.signOut(mAuthGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
-                            @Override
-                            public void onResult(@NonNull Status status) {
-                                if(status.isSuccess()){
-                                    TaskPlace.getDatabaseHelper().removeAlldata();
-                                    Intent i=new Intent(MainActivity.this,LoginActivity.class);
-                                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    startActivity(i);
-                                    finish();
-                                }
-                            }
-                        });
-                    }
-                }
-
-                @Override
-                public void onConnectionSuspended(int i) {
-
-                }
-            });
+            logOutDialog();
         }
     }
     private void uploadImage() {
@@ -436,27 +417,66 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mGoogleApiClient.connect();
         return mGoogleApiClient;
     }
-    /*public void coverImage(){
-        alarmManager= (AlarmManager) getSystemService(ALARM_SERVICE);
-        pendingIntent=createPendingResult(ALARM_ID,new Intent(),0);
-        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime()+10000,10000,pendingIntent);
-    }*/
-    public void coverImage(){
-        ImageView img=findViewById(R.id.cover_image);
-        Calendar calendar=Calendar.getInstance();
-        int hour=calendar.get(Calendar.HOUR_OF_DAY);
-        if(hour>=0 && hour<12){
-            img.setImageDrawable(getResources().getDrawable(R.drawable.morn_min));
-            Log.i("test","GOOD MORNING");
-        }else if(hour>=12 && hour<16){
-            Log.i("test","GOOD Afternoon");
-        }else if(hour>=16 && hour<21){
-            img.setImageDrawable(getResources().getDrawable(R.drawable.eve_min));
-            Log.i("test","GOOD evening");
-            username.setTextColor(Color.WHITE);
-            useremail.setTextColor(Color.WHITE);
-        }else if(hour>=21 && hour<24){
-            Log.i("test","GOOD night");
+    public void logOutDialog(){
+        AlertDialog.Builder builder=new AlertDialog.Builder(this)
+                .setCancelable(false)
+                .setTitle("LogOut")
+                .setMessage("Do you want to logout")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        final GoogleApiClient mAuthGoogleApiClient=buildGoogleApiClientAuth();
+                        mAuthGoogleApiClient.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                            @Override
+                            public void onConnected(@Nullable Bundle bundle) {
+                                FirebaseAuth.getInstance().signOut();
+                                if(mAuthGoogleApiClient.isConnected()){
+                                    Auth.GoogleSignInApi.signOut(mAuthGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
+                                        @Override
+                                        public void onResult(@NonNull Status status) {
+                                            if(status.isSuccess()){
+                                                TaskPlace.getDatabaseHelper().removeAlldata();
+                                                Intent i=new Intent(MainActivity.this,LoginActivity.class);
+                                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                startActivity(i);
+                                                finish();
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+
+                            @Override
+                            public void onConnectionSuspended(int i) {
+
+                            }
+                        });
+
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                ;
+        builder.create();
+        builder.show();
+    }
+
+    @Override
+    public void onBackPressed(){
+        if(backpressedCount<=1 && time_backPressed+2000>=System.currentTimeMillis()) {
+            Intent intent=new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
         }
+        else{
+            backpressedCount++;
+            Toasty.warning(MainActivity.this,"press again to exit",Toast.LENGTH_SHORT).show();
+        }
+        time_backPressed=System.currentTimeMillis();
     }
 }
