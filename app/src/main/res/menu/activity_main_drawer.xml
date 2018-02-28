@@ -18,20 +18,6 @@
             android:icon="@drawable/ic_viewtask_black_24dp"
             android:title="View Task" />
     </group>
-<!--
-    <item android:title="App Specific">
-        <menu>
-            <item
-                android:id="@+id/nav_setting"
-                android:icon="@drawable/ic_settings_black_24dp"
-                android:title="Setting" />
-
-            <item
-                android:id="@+id/nav_about"
-                android:icon="@drawable/ic_info_black_24dp"
-                android:title="About" />
-        </menu>
-    </item>-->
     <item android:title="Account">
         <menu>
             <item

@@ -111,7 +111,8 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
                 List<Location> locations = result.getLocations();
                 String latlng=locations.get(0).getLatitude()+":"+locations.get(0).getLongitude();
                 LocationRequestHelper.setLocationRequesting(context,latlng);
-                LocationResultHelper locationResultHelper = new LocationResultHelper(context, locations);locationResultHelper.checkDistanceBetween(locations.get(0));
+                LocationResultHelper locationResultHelper = new LocationResultHelper(context, locations);
+                locationResultHelper.checkDistanceBetween(locations.get(0));
                 locationResultHelper.saveResults();
                 Log.i(TAG, LocationResultHelper.getSavedLocationResult(context));
             }

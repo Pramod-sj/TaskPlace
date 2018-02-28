@@ -1,4 +1,5 @@
 package com.example.pramod.taskplace.LocationService;
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -16,7 +17,9 @@ import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.app.NotificationChannel;
+import android.util.Log;
 
+import com.example.pramod.taskplace.BroadCastReceiver.AlarmBroadCastReceiver;
 import com.example.pramod.taskplace.Database.DatabaseHelper;
 import com.example.pramod.taskplace.R;
 import com.example.pramod.taskplace.Activities.ScrollingActivity;
@@ -29,15 +32,17 @@ import java.util.List;
 /**
  * Class to process location results.
  */
-class LocationResultHelper {
+public class LocationResultHelper {
     ArrayList<String> locationData=new ArrayList<>();
     final static String KEY_LOCATION_UPDATES_RESULT = "location-update-result";
-    final private static String PRIMARY_CHANNEL = "default";
-    private Context mContext;
+    private static Context mContext;
     private List<Location> mLocations;
     private NotificationManager mNotificationManager;
-    private String sr_no,tasktitle,taskdesc,place;
-    LocationResultHelper(Context context, List<Location> locations) {
+    private String tasktitle,taskdesc,place,task_;
+    private int sr_no;
+    AlarmManager alarmManager;
+
+    public LocationResultHelper(Context context, List<Location> locations) {
         mContext = context;
         mLocations = locations;
     }
@@ -94,62 +99,23 @@ class LocationResultHelper {
      *
      * @return The system service NotificationManager
      */
-    private NotificationManager getNotificationManager() {
-        if (mNotificationManager == null) {
-            mNotificationManager = (NotificationManager) mContext.getSystemService(
-                    Context.NOTIFICATION_SERVICE);
-        }
-        return mNotificationManager;
-    }
+
 
     /**
      * Displays a notification with the location results.
      */
 
-    void showNotification(String sr_no,String place,String tasktitle,String taskdesc,String task_id) {
-
+    void showNotification(int sr_no,String place,String tasktitle,String task_id) {
+        Log.i("showNotification()","inside noti");
+        alarmManager= (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+        Intent intent=new Intent(mContext,AlarmBroadCastReceiver.class);
+        intent.putExtra("task_id",task_id);
+        intent.putExtra("task_place",place);
+        intent.putExtra("task_title",tasktitle);
+        intent.putExtra("sr_no",String.valueOf(sr_no));
+        PendingIntent pendingIntent=PendingIntent.getBroadcast(mContext,sr_no,intent,0);
+        alarmManager.set(AlarmManager.RTC_WAKEUP,0,pendingIntent);
         //notification channel is required for Android oreo
-        NotificationChannel channel = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            channel = new NotificationChannel(PRIMARY_CHANNEL, mContext.getString(R.string.default_channel), NotificationManager.IMPORTANCE_DEFAULT);
-            channel.enableVibration(true);
-            channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
-            getNotificationManager().createNotificationChannel(channel);
-        }
-        //Intent i=new Intent(mContext,LocationUpdatesBroadcastReceiver.class);
-        //PendingIntent broadIntent=PendingIntent.getBroadcast(mContext,0,i,0);
-        //swipe delete
-        Intent swipeActionIntent=new Intent(mContext,SwipeActionEvent.class);
-        PendingIntent swipePendingIntent=PendingIntent.getBroadcast(mContext,1,swipeActionIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-        //end of swipe delete
-        //Intent actionIntent=new Intent(mContext,ActionEvent.class);
-        //actionIntent.putExtra("task_id",task_id);
-        //actionIntent.putExtra("not_id",sr_no);
-        //PendingIntent pendingIntent=PendingIntent.getBroadcast(mContext,1,actionIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-        Intent notificationIntent = new Intent(mContext, ScrollingActivity.class);
-        notificationIntent.putExtra("task_id",task_id);
-        notificationIntent.putExtra("NotifyPage","fromNotif");
-        PendingIntent notificationPendingIntent=PendingIntent.getActivity(mContext,1,notificationIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-        //TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
-        //stackBuilder.addParentStack(MainActivity.class);
-        //stackBuilder.addNextIntent(notificationIntent);
-        //PendingIntent notificationPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-        SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(mContext);
-        String url=preferences.getString("notifications_new_message_ringtone","content://settings/system/notification_sound");
-        NotificationCompat.Builder notification = new NotificationCompat.Builder(mContext,PRIMARY_CHANNEL);
-        notification.setSmallIcon(R.mipmap.adaptive_ic_launcher_foreground);
-        notification.setContentTitle(place);
-        notification.setContentText(tasktitle);
-        notification.setAutoCancel(true);
-        //notification.addAction(R.drawable.ic_logout_black_24dp,"MARK AS DONE",pendingIntent);
-        notification.setContentIntent(notificationPendingIntent);
-        notification.setSound(Uri.parse(url));
-        if(preferences.getBoolean("notifications_new_message_vibrate",true)){
-            notification.setVibrate(new long[]{50,120,200,300});
-        }
-        notification.setDeleteIntent(swipePendingIntent);
-        getNotificationManager().notify(Integer.parseInt(sr_no),notification.build());
-        wakeUp();
     }
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void checkDistanceBetween(Location currLoc){
@@ -165,44 +131,17 @@ class LocationResultHelper {
             if(currLoc.distanceTo(destloc)<Integer.parseInt(preferences.getString("radius","100"))){
                 taskdesc=cursor.getString(4);
                 tasktitle=cursor.getString(3);
-                sr_no=cursor.getString(0);
+                sr_no= cursor.getInt(0);
                 place=cursor.getString(2);
-                if(LocationRequestHelper.getNotificationFlag(mContext)==true) {
-                    showNotification(sr_no, place, tasktitle, taskdesc, cursor.getString(1));
-                    LocationRequestHelper.setNotificationFlag(mContext,false);
+                if (LocationRequestHelper.getNotificationFlag(mContext) == true) {
+                        showNotification(sr_no, place, tasktitle, cursor.getString(1));
+                        LocationRequestHelper.setNotificationFlag(mContext, false);
                 }
+
             }
-        }
-
-    }
-    //public static class ActionEvent extends BroadcastReceiver{
-    //    @Override
-    //    public void onReceive(Context context, Intent intent) {
-    //            DatabaseHelper db = new DatabaseHelper(context);
-    //            SQLiteDatabase sql = db.getWritableDatabase();
-    //            FirebaseDatabaseHelper helper=new FirebaseDatabaseHelper(context);
-    //helper.removeDatafromFirebase(intent.getStringExtra("task_id"));
-    //            sql.delete("Task", "task_id=?", new String[]{intent.getStringExtra("task_id")});
-    //            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-     //           notificationManager.cancel(Integer.parseInt(intent.getStringExtra("not_id")));
-     //           LocationRequestHelper.setNotificationFlag(context, true);
-     //   }
-    //}
-    public static class SwipeActionEvent extends BroadcastReceiver{
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            //set flag to true so that to receive message again
-            LocationRequestHelper.setNotificationFlag(context, true);
-        }
-
-    }
-    public void wakeUp(){
-        PowerManager powerManager= (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
-        if(!powerManager.isScreenOn()){
-            PowerManager.WakeLock wl = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK |PowerManager.ACQUIRE_CAUSES_WAKEUP |PowerManager.ON_AFTER_RELEASE,"MyLock");
-            wl.acquire(10000);
-            PowerManager.WakeLock wl_cpu = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"MyCpuLock");
-            wl_cpu.acquire(10000);
+            else{
+                LocationRequestHelper.setNotificationFlag(mContext,true);
+            }
         }
     }
 

@@ -1,14 +1,20 @@
 package com.example.pramod.taskplace.Activities;
 
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -20,9 +26,11 @@ import android.widget.Toast;
 
 import com.example.pramod.taskplace.Database.FirebaseDatabaseHelper;
 import com.example.pramod.taskplace.LocationService.LocationRequestHelper;
+import com.example.pramod.taskplace.LocationService.LocationResultHelper;
 import com.example.pramod.taskplace.Model.TaskDetails;
 import com.example.pramod.taskplace.R;
 import com.example.pramod.taskplace.TaskPlace;
+import com.google.android.gms.location.LocationResult;
 
 import es.dmoral.toasty.Toasty;
 
@@ -33,17 +41,22 @@ public class ScrollingActivity extends AppCompatActivity {
     AlertDialog alertUpdate,alertDelete;
     String firebaseDataId;
     Button b1;
+    int sr_no;
     FloatingActionButton fab;
+    Vibrator vibrator;
+    MediaPlayer mediaPlayer;
+    boolean flag=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scrolling);
-        LocationRequestHelper.setNotificationFlag(this,true);
+        vibrator= (Vibrator) getSystemService(VIBRATOR_SERVICE);
         fab = (FloatingActionButton)findViewById(R.id.fab);
         String page=getIntent().getStringExtra("NotifyPage");
         b1=findViewById(R.id.deleteButton);
         if(page!=null) {
             if (page.equals("fromNotif")) {
+                flag=true;
                 firebaseDataId = getIntent().getStringExtra("task_id");
                 b1.setVisibility(View.VISIBLE);
                 fab.setVisibility(View.GONE);
@@ -186,8 +199,32 @@ public class ScrollingActivity extends AppCompatActivity {
                 .setCancelable(false);
         builder.create();
         builder.show();
-
     }
-
+    public void vibratePhone(){
+        long [] pattern={50,120,200,300};
+        vibrator.vibrate(pattern,1);
+    }
+    public void playRingTone(){
+        SharedPreferences preferences= PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String url=preferences.getString("notifications_new_message_ringtone","content://settings/system/notification_sound");
+        mediaPlayer=MediaPlayer.create(getApplicationContext(), Uri.parse(url));
+        mediaPlayer.start();
+    }
+    public void onStart() {
+        super.onStart();
+        if(flag) {
+            vibratePhone();
+            playRingTone();
+        }
+    }
+    public void onStop() {
+        if(flag) {
+            if (vibrator.hasVibrator()) {
+                vibrator.cancel();
+            }
+            mediaPlayer.stop();
+        }
+        super.onStop();
+    }
 
 }

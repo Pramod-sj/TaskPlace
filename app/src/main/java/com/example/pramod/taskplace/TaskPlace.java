@@ -31,7 +31,6 @@ public class TaskPlace extends Application {
         super.onCreate();
         mInstance=this;
         mgoogleApiHelper=new GoogleApiHelper(mInstance);
-        LocationRequestHelper.setNotificationFlag(mInstance,true);
         databaseHelper=new DatabaseHelper(mInstance);
         CaocConfig.Builder.create()
                 .backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT) //default: CaocConfig.BACKGROUND_MODE_SHOW_CUSTOM
