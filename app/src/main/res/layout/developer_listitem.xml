@@ -10,7 +10,7 @@
         android:layout_width="110dp"
         android:layout_height="110dp"
         app:civ_border_width="3dp"
-        app:civ_border_color="@color/colorAccent"
+        app:civ_border_color="#ffffff"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="45dp"
         android:elevation="8dp" />
@@ -18,11 +18,11 @@
         android:id="@+id/profileCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="6dp"
+        app:cardCornerRadius="4dp"
         app:cardElevation="4dp"
         android:layout_margin="8sp"
         app:cardUseCompatPadding="false">
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="95dp"
             android:orientation="horizontal"
@@ -34,7 +34,15 @@
                 android:textStyle="bold"
                 android:padding="8dp"
                 android:textColor="#ffffff"/>
-        </LinearLayout>
+
+            <ImageView
+                android:layout_margin="8dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:src="@drawable/splashlogo" />
+        </RelativeLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"

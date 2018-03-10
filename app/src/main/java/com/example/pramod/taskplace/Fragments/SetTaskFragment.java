@@ -73,7 +73,7 @@ public class SetTaskFragment extends Fragment {
                 taskdesc=taskDetails.getText().toString();
                 taskData=taskEditText.getText().toString();
                 if(taskData.equals("")||placeSelected==null||taskdesc.equals("")){
-                    Snackbar.make(v,"Please set all the stuffs....:P",Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(v,"All fields are mandatory",Snackbar.LENGTH_SHORT).show();
                     return;
                 }
                 progressDialog.show();
@@ -121,12 +121,10 @@ public class SetTaskFragment extends Fragment {
         Snackbar.make(getActivity().findViewById(R.id.ll1),"Successfully added",Snackbar.LENGTH_SHORT).show();
         taskDetails.setText("");
         taskEditText.setText("");
-        txt.setText("click me to select place..");
+        txt.setText("Click me to select place");
+        txt.setTextColor(Color.parseColor("#727272"));
         progressDialog.dismiss();
-
-
     }
-
     public boolean isConnected_custom(){
         boolean isInternetAvailable = false;
         try {

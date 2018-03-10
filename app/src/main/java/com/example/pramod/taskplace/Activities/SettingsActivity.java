@@ -1,9 +1,6 @@
 package com.example.pramod.taskplace.Activities;
-
-import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -13,33 +10,23 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatDelegate;
 import android.view.MenuItem;
 import android.widget.Toast;
-
-import com.example.pramod.taskplace.Activities.MainActivity;
 import com.example.pramod.taskplace.LocationService.LocationRequestHelper;
 import com.example.pramod.taskplace.LocationService.LocationServiceMethods;
 import com.example.pramod.taskplace.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import java.io.File;
 
-/**
- * A {@link PreferenceActivity} that presents a set of application settings. On
- * handset devices, settings are presented as a single list. On tablets,
- * settings are split by category, with category headers shown to the left of
- * the list of settings.
- * <p>
- * See <a href="http://developer.android.com/design/patterns/settings.html">
- * Android Design: Settings</a> for design guidelines and the <a
- * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
- * API Guide</a> for more information on developing a Settings UI.
- */
+import es.dmoral.toasty.Toasty;
+
 public class SettingsActivity extends PreferenceActivity {
     GoogleApiClient mGoogleApiClient;
+    private AppCompatDelegate delegate;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,20 +37,44 @@ public class SettingsActivity extends PreferenceActivity {
         clearcache.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                clearCache();
+                Toasty.warning(getApplicationContext(),"We are working on this feature",Toast.LENGTH_SHORT).show();
                 return true;
             }
         });
         SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         final SharedPreferences.Editor editor=preferences.edit();
-        if(preferences.getBoolean("notification",false)==true){
-            Toast.makeText(getApplicationContext(),"Notification enable",Toast.LENGTH_SHORT).show();
+        final SwitchPreference vibration= (SwitchPreference) findPreference("notifications_new_message_vibrate");
+        if(vibration.isChecked()){
+            vibration.setSummary("Vibration is enable");
+        }else{
+            vibration.setSummary("Vibration is disable");
         }
+        vibration.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                if(vibration.isChecked()){
+                    vibration.setSummary("Vibration is enable");
+                }else{
+                    vibration.setSummary("Vibration is disable");
+                }
+                return true;
+            }
+        });
         final ListPreference listPreference= (ListPreference) findPreference("radius");
         listPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 listPreference.setValue((String) newValue);
+                return true;
+            }
+        });
+        final ListPreference NotiTypePreference= (ListPreference) findPreference("not_type");
+        NotiTypePreference.setSummary(NotiTypePreference.getEntry());
+        listPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                NotiTypePreference.setValue((String) newValue);
+                NotiTypePreference.setSummary(NotiTypePreference.getEntry());
                 return true;
             }
         });
@@ -106,13 +117,15 @@ public class SettingsActivity extends PreferenceActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-    /**
-     * Set up the {@link android.app.ActionBar}, if the API is available.
-     */
+    private AppCompatDelegate getDelegate(){
+        if(delegate==null){
+            delegate=AppCompatDelegate.create(this,null);
+        }
+        return delegate;
+    }
     private void setupActionBar() {
-        android.app.ActionBar actionBar =  getActionBar();
+        ActionBar actionBar =  getDelegate().getSupportActionBar();
         if (actionBar != null) {
-            // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
@@ -140,37 +153,15 @@ public class SettingsActivity extends PreferenceActivity {
         mGoogleApiClient.connect();
 
     }
-    private void clearCache(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            ((ActivityManager)getApplicationContext().getSystemService(ACTIVITY_SERVICE)).clearApplicationUserData();
-        }
-       /* try{
-            File cacheDir= new File(getCacheDir().getParent());
-            if(cacheDir.isDirectory()&&cacheDir!=null){
-                cacheDir.delete();
-                Toast.makeText(getApplicationContext(),"Cache removed",Toast.LENGTH_SHORT).show();
-            }
-            else{
-                Toast.makeText(getApplicationContext(),"Cache doesnt exist",Toast.LENGTH_SHORT).show();
-            }
-            File cacheExternalDir=getApplicationContext().getExternalCacheDir();
-            if(cacheExternalDir.isDirectory() && cacheExternalDir!=null){
-                cacheExternalDir.delete();
-                Toast.makeText(getApplicationContext(),"E Cache exist",Toast.LENGTH_SHORT).show();
-
-            }
-            else {
-                Toast.makeText(getApplicationContext(),"E Cache doesnt exist",Toast.LENGTH_SHORT).show();
-
-            }
-        }
-        catch(Exception e){Toast.makeText(getApplicationContext(),"Error while deleting cache\n"+e,Toast.LENGTH_SHORT).show();}
-        */
-    }
 
     protected void onStop(){
         super.onStop();
-        finish();
     }
+
+    protected void onDestroy(){
+        finish();
+        super.onDestroy();
+    }
+
 
 }

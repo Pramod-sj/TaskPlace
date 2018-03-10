@@ -25,7 +25,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.pramod.taskplace.Database.FirebaseDatabaseHelper;
-import com.example.pramod.taskplace.LocationService.LocationRequestHelper;
 import com.example.pramod.taskplace.LocationService.LocationResultHelper;
 import com.example.pramod.taskplace.Model.TaskDetails;
 import com.example.pramod.taskplace.R;
@@ -51,12 +50,14 @@ public class ScrollingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scrolling);
         vibrator= (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        fab = (FloatingActionButton)findViewById(R.id.fab);
+        fab = findViewById(R.id.fab);
         String page=getIntent().getStringExtra("NotifyPage");
         b1=findViewById(R.id.deleteButton);
         if(page!=null) {
             if (page.equals("fromNotif")) {
-                flag=true;
+                if(Integer.parseInt(getIntent().getExtras().getString("not_type"))==1) {
+                    flag = true;
+                }
                 firebaseDataId = getIntent().getStringExtra("task_id");
                 b1.setVisibility(View.VISIBLE);
                 fab.setVisibility(View.GONE);
@@ -177,6 +178,12 @@ public class ScrollingActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if(isConnected_custom()) {
+                            if(flag) {
+                                if (vibrator.hasVibrator()) {
+                                    vibrator.cancel();
+                                }
+                                mediaPlayer.stop();
+                            }
                             TaskPlace.getDatabaseHelper().deteleData(firebaseDataId);
                             FirebaseDatabaseHelper helper = new FirebaseDatabaseHelper(ScrollingActivity.this);
                             helper.removeDatafromFirebase(firebaseDataId);
@@ -217,14 +224,14 @@ public class ScrollingActivity extends AppCompatActivity {
             playRingTone();
         }
     }
-    public void onStop() {
+    public void onDestroy() {
         if(flag) {
             if (vibrator.hasVibrator()) {
                 vibrator.cancel();
             }
             mediaPlayer.stop();
         }
-        super.onStop();
+        super.onDestroy();
     }
 
 }

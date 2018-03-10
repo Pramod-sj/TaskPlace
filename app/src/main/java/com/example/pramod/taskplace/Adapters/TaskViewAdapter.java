@@ -24,17 +24,15 @@ import java.util.ArrayList;
 
 public class TaskViewAdapter extends BaseAdapter {
     private ArrayList<String> contents;
-    private ArrayList<String> taskdates;
     private ArrayList<String> placenames;
     private ArrayList<String> distance;
     private ArrayList<String> firebaseIds;
     private Context context;
-    public TaskViewAdapter(Context context, ArrayList<String> content, ArrayList<String> taskdates, ArrayList<String> placenames, ArrayList<String> distance,ArrayList<String> firebaseIds)
+    public TaskViewAdapter(Context context, ArrayList<String> content,  ArrayList<String> placenames, ArrayList<String> distance,ArrayList<String> firebaseIds)
     {
         this.firebaseIds=firebaseIds;
         this.context=context;
         this.contents=content;
-        this.taskdates=taskdates;
         this.placenames=placenames;
         this.distance=distance;
     }
@@ -63,7 +61,6 @@ public class TaskViewAdapter extends BaseAdapter {
             LayoutInflater inflater = LayoutInflater.from(context);
             convertView = inflater.inflate(R.layout.listitem, parent, false);
             viewHolder.content_textView = convertView.findViewById(R.id.contentData);
-            viewHolder.date_textView = convertView.findViewById(R.id.timeData);
             viewHolder.place_textView = convertView.findViewById(R.id.placeData);
             viewHolder.distance_textView=convertView.findViewById(R.id.distance);
             viewHolder.firebaseIds_invisible=convertView.findViewById(R.id.firebaseId);
@@ -76,7 +73,6 @@ public class TaskViewAdapter extends BaseAdapter {
 
         viewHolder.content_textView.setText(contents.get(position));
         viewHolder.place_textView.setText(placenames.get(position));
-        viewHolder.date_textView.setText(taskdates.get(position));
         viewHolder.firebaseIds_invisible.setText(firebaseIds.get(position));
         if(distance.size()!=0 ){
             viewHolder.distance_textView.setText(String.valueOf(distance.get(position)));
@@ -87,7 +83,6 @@ public class TaskViewAdapter extends BaseAdapter {
     }
     class ViewHolder {
         TextView content_textView;
-        TextView date_textView;
         TextView place_textView;
         TextView distance_textView;
         TextView firebaseIds_invisible;

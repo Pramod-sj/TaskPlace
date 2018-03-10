@@ -1,9 +1,12 @@
 package com.example.pramod.taskplace.Fragments;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +15,8 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.example.pramod.taskplace.Activities.MainActivity;
 import com.example.pramod.taskplace.R;
 import com.example.pramod.taskplace.TaskPlace;
 import com.google.android.gms.common.api.Status;
@@ -62,7 +67,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,GoogleM
         SupportMapFragment mapFragment = (SupportMapFragment)this.getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         supportPlaceAutocompleteFragment= (SupportPlaceAutocompleteFragment)this.getChildFragmentManager().findFragmentById(R.id.place);
-        supportPlaceAutocompleteFragment.setHint("You can search place or click on map to select place..");
+        supportPlaceAutocompleteFragment.setHint("Search place");
         supportPlaceAutocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
@@ -89,22 +94,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,GoogleM
         ((AppCompatActivity)getActivity()).getSupportActionBar().show();
         super.onStop();
     }
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
-    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setMyLocationEnabled(true);
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.ACCESS_FINE_LOCATION},10);
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(21.7679,78.8718),3));
         mMap.setOnMapClickListener(this);
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
@@ -131,8 +129,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,GoogleM
                 b.putDouble("lng",marker.getPosition().longitude);
                 f.setArguments(b);
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flContent,f).commit();
+
             }
+
         });
+
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
     }
     @Override
     public void onMapClick(LatLng latLng) {

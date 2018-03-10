@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#808080</color>
-    <color name="orange">#FF8C00</color>
-    <color name="darkOrange">#EF6C00</color>
+    <color name="blue">#3F51B5</color>
+    <color name="darkblue">#303F9F</color>
+    <color name="colorAccent">#f44336</color>
+    <color name="colorPrimary">#FF8C00</color>
+    <color name="colorPrimaryDark">#EF6C00</color>
     <color name="purple">#6A1B9A</color>
     <color name="textColor">#ffffff</color>
+    <color name="tomato">#f44336</color>
 </resources>

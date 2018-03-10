@@ -50,7 +50,7 @@ public class ViewTaskFragment extends Fragment implements SharedPreferences.OnSh
     //array for viewing purpose
     ArrayList<String> firebaseIDS=new ArrayList<>();
     ArrayList<String> contents=new ArrayList<String>();
-    ArrayList<String> dates=new ArrayList<String>();
+    //ArrayList<String> dates=new ArrayList<String>();
     ArrayList<String> places=new ArrayList<String>();
     ProgressBar pg1;
     ListView listView;
@@ -73,7 +73,7 @@ public class ViewTaskFragment extends Fragment implements SharedPreferences.OnSh
         pg1=view.findViewById(R.id.loading);
         distMeter=new ArrayList<>();
         listView=view.findViewById(R.id.listView);
-        adapter=new TaskViewAdapter(getActivity().getBaseContext(),contents,dates,places,distMeter,firebaseIDS);
+        adapter=new TaskViewAdapter(getActivity().getBaseContext(),contents,places,distMeter,firebaseIDS);
         ll=view.findViewById(R.id.ll);
         pg1.getIndeterminateDrawable().setColorFilter(Color.parseColor("#FF8C00"), PorterDuff.Mode.MULTIPLY);
         aSwitch=view.findViewById(R.id.taskActivator);
@@ -132,11 +132,13 @@ public class ViewTaskFragment extends Fragment implements SharedPreferences.OnSh
         aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
                 if(aSwitch.isChecked()){
                     methods.createLocationRequest();
                     methods.requestLocationUpdates();
                 }
                 else {
+                    LocationRequestHelper.setNotificationFlag(getActivity(),true);
                     methods.removeLocationUpdates();
                 }
             }
@@ -172,13 +174,11 @@ public class ViewTaskFragment extends Fragment implements SharedPreferences.OnSh
         getActivity().setTitle("View Task");
     }
     public void fetchOfflineData(){
-        if(!contents.isEmpty()||!dates.isEmpty()||!places.isEmpty()){
+        if(!contents.isEmpty()||!places.isEmpty()){
             contents.clear();
-            dates.clear();
             places.clear();
         }
         for(TaskDetails details:db.fetchData()){
-            dates.add(details.getTaskdate());
             contents.add(details.getTaskTitle());
             places.add(details.getPlace());
             firebaseIDS.add(details.getTaskid());

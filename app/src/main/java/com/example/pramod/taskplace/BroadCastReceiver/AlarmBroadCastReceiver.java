@@ -1,5 +1,6 @@
 package com.example.pramod.taskplace.BroadCastReceiver;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -25,12 +26,14 @@ public class AlarmBroadCastReceiver extends BroadcastReceiver {
     final private static String PRIMARY_CHANNEL = "default";
     Context mContext;
     String task_id,tasktitle,place;
+    int sr_no;
     @Override
     public void onReceive(Context context, Intent intent) {
         mContext=context;
         task_id=intent.getExtras().getString("task_id");
         tasktitle=intent.getExtras().getString("task_title");
         place=intent.getExtras().getString("task_place");
+        sr_no= Integer.parseInt(intent.getExtras().getString("sr_no"));
         showNotificationFromAlarm();
     }
     private NotificationManager getNotificationManager() {
@@ -40,39 +43,45 @@ public class AlarmBroadCastReceiver extends BroadcastReceiver {
         }
         return mNotificationManager;
     }
-    public void showNotificationFromAlarm(){
+    @SuppressLint("WrongConstant")
+    public void showNotificationFromAlarm() {
         NotificationChannel channel;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            channel = new NotificationChannel(PRIMARY_CHANNEL, mContext.getString(R.string.default_channel), NotificationManager.IMPORTANCE_DEFAULT);
+            channel = new NotificationChannel(PRIMARY_CHANNEL, mContext.getString(R.string.default_channel), NotificationManager.IMPORTANCE_MAX);
             channel.enableVibration(true);
-            channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             getNotificationManager().createNotificationChannel(channel);
         }
-        //swipe delete
-        //Intent swipeActionIntent=new Intent(mContext,SwipeActionEvent.class);
-        //PendingIntent swipePendingIntent=PendingIntent.getBroadcast(mContext,1,swipeActionIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-        //end of swipe delete
-        Intent notificationIntent = new Intent(mContext, ScrollingActivity.class);
-        notificationIntent.putExtra("task_id",task_id);
-        notificationIntent.putExtra("NotifyPage","fromNotif");
-        /*PendingIntent notificationPendingIntent=PendingIntent.getActivity(mContext,1,notificationIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-        SharedPreferences preferences= PreferenceManager.getDefaultSharedPreferences(mContext);
-        String url=preferences.getString("notifications_new_message_ringtone","content://settings/system/notification_sound");
-        NotificationCompat.Builder notification = new NotificationCompat.Builder(mContext,PRIMARY_CHANNEL);
-        notification.setSmallIcon(android.R.drawable.ic_notification_overlay);
-        notification.setContentTitle(place);
-        notification.setContentText(tasktitle);
-        notification.setAutoCancel(true);
-        //notification.addAction(R.drawable.ic_logout_black_24dp,"MARK AS DONE",pendingIntent);
-        notification.setContentIntent(notificationPendingIntent);
-        notification.setSound(Uri.parse(url));
-        if(preferences.getBoolean("notifications_new_message_vibrate",true)){
-            notification.setVibrate(new long[]{50,120,200,300});
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        if (Integer.parseInt(preferences.getString("not_type", "0")) == 0) {
+            Intent notificationIntent = new Intent(mContext, ScrollingActivity.class);
+            notificationIntent.putExtra("task_id", task_id);
+            notificationIntent.putExtra("NotifyPage", "fromNotif");
+            notificationIntent.putExtra("not_type","2");
+            PendingIntent notificationPendingIntent = PendingIntent.getActivity(mContext, 1, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            String url = preferences.getString("notifications_new_message_ringtone", "content://settings/system/notification_sound");
+            NotificationCompat.Builder notification = new NotificationCompat.Builder(mContext, PRIMARY_CHANNEL);
+            notification.setSmallIcon(R.drawable.ic_task_white_24dp);
+            notification.setContentTitle(place);
+            notification.setContentText(tasktitle);
+            notification.setAutoCancel(true);
+            notification.setFullScreenIntent(notificationPendingIntent,true);
+            //notification.addAction(R.drawable.ic_logout_black_24dp,"MARK AS DONE",pendingIntent);
+            notification.setContentIntent(notificationPendingIntent);
+            notification.setSound(Uri.parse(url));
+            if (preferences.getBoolean("notifications_new_message_vibrate", true)) {
+                notification.setVibrate(new long[]{50, 120, 200, 300});
+            }
+            getNotificationManager().notify(sr_no, notification.build());
+            wakeUp();
+        } else {
+            Intent notificationIntent = new Intent(mContext, ScrollingActivity.class);
+            notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            notificationIntent.putExtra("task_id", task_id);
+            notificationIntent.putExtra("NotifyPage", "fromNotif");
+            notificationIntent.putExtra("not_type","1");
+            mContext.startActivity(notificationIntent);
         }
-        //notification.setDeleteIntent(swipePendingIntent);
-        getNotificationManager().notify(sr_no,notification.build());*/
-        wakeUp();
-        mContext.startActivity(notificationIntent);
     }
     public void wakeUp(){
         PowerManager powerManager= (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);

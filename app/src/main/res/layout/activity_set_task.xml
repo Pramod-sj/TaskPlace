@@ -91,7 +91,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:lines="6"
-                    android:hint="Description....?"
+                    android:hint="Add some description....?"
                     android:gravity="start"
                     android:layout_margin="6sp"
                     android:background="@drawable/rounded_edittext"

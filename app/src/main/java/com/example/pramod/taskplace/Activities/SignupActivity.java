@@ -59,20 +59,23 @@ public class SignupActivity extends AppCompatActivity {
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                progressDialog.setMessage("please wait......");
+                progressDialog.setMessage("Please wait......");
                 progressDialog.show();
                 String email_id=email.getText().toString();
                 String password_=password.getText().toString();
                 if(TextUtils.isEmpty(email_id)){
                     Toasty.warning(getApplicationContext(),"Please enter your email id",Toast.LENGTH_SHORT).show();
+                    progressDialog.cancel();
                     return;
                 }
                 if(TextUtils.isEmpty(password_)){
                     Toasty.warning(getApplicationContext(),"Please enter password",Toast.LENGTH_SHORT).show();
+                    progressDialog.cancel();
                     return;
                 }
                 if(password_.length()<6){
                     Toasty.warning(getApplicationContext(),"Password to short",Toast.LENGTH_SHORT).show();
+                    progressDialog.cancel();
                     return;
 
                 }

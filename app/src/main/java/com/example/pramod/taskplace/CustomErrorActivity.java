@@ -1,46 +1,48 @@
 package com.example.pramod.taskplace;
 
+import android.app.usage.ExternalStorageStats;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.pramod.taskplace.Model.CurrentUserData;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import cat.ereza.customactivityoncrash.CustomActivityOnCrash;
 import cat.ereza.customactivityoncrash.config.CaocConfig;
+import es.dmoral.toasty.Toasty;
 
 /**
  * Created by pramod on 28/1/18.
  */
 
 public class CustomErrorActivity extends AppCompatActivity {
+    String log;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customeerror);
-
-        //**IMPORTANT**
-        //The custom error activity in this sample is uglier than the default one and just
-        //for demonstration purposes, please don't copy it to your project!
-        //We recommend taking the original library's DefaultErrorActivity as a basis.
-        //Of course, you are free to implement it as you wish in your application.
-
-        //These four methods are available for you to use:
-        //CustomActivityOnCrash.getStackTraceFromIntent(getIntent()): gets the stack trace as a string
-        //CustomActivityOnCrash.getActivityLogFromIntent(getIntent()): gets the activity log as a string
-        //CustomActivityOnCrash.getAllErrorDetailsFromIntent(context, getIntent()): returns all error details including stacktrace as a string
-        //CustomActivityOnCrash.getConfigFromIntent(getIntent()): returns the config of the library when the error happened
-
-        //Now, treat here the error as you wish. If you allow the user to restart or close the app,
-        //don't forget to call the appropriate methods.
-        //Otherwise, if you don't finish the activity, you will get the CustomErrorActivity on the activity stack and it will be visible again under some circumstances.
-        //Also, you will get multiprocess problems in API<17.
-
-        TextView errorDetailsText = findViewById(R.id.error_details);
-        errorDetailsText.setText(CustomActivityOnCrash.getStackTraceFromIntent(getIntent()));
+        log=CustomActivityOnCrash.getStackTraceFromIntent(getIntent());
         Button restartButton = findViewById(R.id.restart_button);
+        String manufacturer= Build.MANUFACTURER;
+        String model=Build.MODEL;
+        String brand= Build.BRAND;
+        String version=BuildConfig.VERSION_NAME;
+        String mobileData="Mobile Info:\nManufacturer: "+manufacturer+"\nModel: "+model+"\nBrand: "+brand+"\nApp Version: "+version+"\nDisplay: "+Build.DISPLAY;
+        log=log+"\n"+mobileData;
         final CaocConfig config = CustomActivityOnCrash.getConfigFromIntent(getIntent());
         if (config == null) {
             finish();
@@ -63,5 +65,28 @@ public class CustomErrorActivity extends AppCompatActivity {
                 }
             });
         }
+        Button send=findViewById(R.id.Send_button);
+        send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendMail();
+            }
+        });
+    }
+    private void sendMail(){
+
+        Log.i("sendMail()","Seding error message to developer");
+        String TO="pramodsinghjantwal@gmail.com";
+        Intent i=new Intent(Intent.ACTION_SENDTO,Uri.parse("mailto:"+TO));
+        i.putExtra(Intent.EXTRA_SUBJECT,"Logcat");
+        i.putExtra(Intent.EXTRA_TEXT,log);
+        i.putExtra(Intent.EXTRA_CC,new CurrentUserData(getApplicationContext()).getCurrentUserEmail());
+        try {
+            startActivity(Intent.createChooser(i,"Select client"));
+        }catch(Exception e){
+            Toasty.error(getApplicationContext(),"Cannot send the log no email client installed.",Toast.LENGTH_LONG).show();
+        }
+        //String[] FROM={}
+
     }
 }

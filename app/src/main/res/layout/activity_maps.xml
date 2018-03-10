@@ -21,6 +21,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:name="com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment"/>
-        </android.support.v7.widget.CardView>
+        </android.support.v7.widget.CardView>z
     </fragment>
 </LinearLayout>

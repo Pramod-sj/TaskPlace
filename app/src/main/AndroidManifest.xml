@@ -10,7 +10,8 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.CLEAR_APP_CACHE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <application
         android:name=".TaskPlace"
         android:allowClearUserData="true"
@@ -24,38 +25,53 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAg4vdxuQp5yUmNrMhQtrUhdtAOr9b7KIU" />
-        <receiver android:name=".BroadCastReceiver.SwipeActionEvent" />
         <receiver android:name=".BroadCastReceiver.AlarmBroadCastReceiver"/>
-        <activity android:name=".Activities.LoginActivity" />
-        <activity android:name=".Activities.SignupActivity" />
+        <activity
+            android:name=".Activities.LoginActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden"/>
+        <activity
+            android:name=".Activities.SignupActivity"
+            android:screenOrientation="portrait"
+
+            android:windowSoftInputMode="stateHidden"/>
         <activity
             android:name=".Activities.MainActivity"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden"
             android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".Activities.DevPageActivity" />
+        <activity
+            android:name=".Activities.DevPageActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".Activities.SplashScreen"
-            android:theme="@style/SplashScreen">
+            android:theme="@style/SplashScreen"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
-
                 <action android:name="cat.ereza.customactivityoncrash.RESTART" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities.AboutActivity" />
-        <activity android:name=".Activities.OpenLibraries_Activity" />
+        <activity
+            android:name=".Activities.AboutActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Activities.OpenLibraries_Activity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".Activities.SettingsActivity"
-            android:label="@string/title_activity_settings" />
+            android:label="@string/title_activity_settings"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".Activities.StartPage"
-            android:theme="@style/SampleWelcomeScreenTheme" />
+            android:theme="@style/SampleWelcomeScreenTheme"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".CustomErrorActivity"
             android:label="@string/error_title"
-            android:process=":error_activity">
+            android:process=":error_activity"
+            android:screenOrientation="portrait">
 
             <!-- You can also use this instead of using CustomActivityOnCrash.setErrorActivityClass(CustomErrorActivity.class); -->
             <intent-filter>
@@ -80,7 +96,8 @@
         <activity
             android:name=".Activities.ScrollingActivity"
             android:label="@string/title_activity_scrolling"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

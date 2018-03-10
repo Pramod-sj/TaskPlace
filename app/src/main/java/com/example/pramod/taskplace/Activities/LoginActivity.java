@@ -1,9 +1,10 @@
 package com.example.pramod.taskplace.Activities;
-// 1B:7D:A5:BD:89:63:C0:F7:28:85:C1:E1:80:BE:42:73:A2:78:E7:4A
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -128,6 +129,8 @@ public class LoginActivity extends AppCompatActivity{
                                 CurrentUserData currentUserData=new CurrentUserData(LoginActivity.this);
                                 currentUserData.setCurrentUID(UID);
                                 currentUserData.setCurrentUserEmail(email_id);
+                                SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                                prefs.edit().putBoolean("firstlogin",true).commit();
                                 new getDataFromFirebase().execute();
                             }
                             else{
@@ -170,6 +173,7 @@ public class LoginActivity extends AppCompatActivity{
         @Override
         protected Void doInBackground(Void... voids) {
             //super.doInBackground(Void... voids);
+
             FirebaseDatabaseHelper db=new FirebaseDatabaseHelper(LoginActivity.this);
             db.insertDataToOffline();
             Log.i("inBackground","foInBackground");

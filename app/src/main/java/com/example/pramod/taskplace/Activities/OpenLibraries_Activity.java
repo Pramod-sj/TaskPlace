@@ -3,7 +3,9 @@ package com.example.pramod.taskplace.Activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -59,10 +61,29 @@ public class OpenLibraries_Activity extends AppCompatActivity {
                 }
             }
         });
+        ActionBar actionBar=getSupportActionBar();
+        if (actionBar != null) {
+            // Show the Up button in the action bar.
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     protected void onStop(){
         super.onStop();
-        finish();
     }
+
+    protected void onDestroy(){
+        finish();
+        super.onDestroy();
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 }

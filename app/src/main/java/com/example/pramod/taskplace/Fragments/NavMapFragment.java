@@ -1,11 +1,13 @@
 package com.example.pramod.taskplace.Fragments;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.location.Location;
@@ -16,6 +18,7 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,6 +35,7 @@ import com.akexorcist.googledirection.constant.AvoidType;
 import com.akexorcist.googledirection.model.Direction;
 import com.akexorcist.googledirection.model.Route;
 import com.akexorcist.googledirection.util.DirectionConverter;
+import com.example.pramod.taskplace.Activities.MainActivity;
 import com.example.pramod.taskplace.Database.DatabaseHelper;
 import com.example.pramod.taskplace.LocationService.LocationRequestHelper;
 import com.example.pramod.taskplace.Model.CurrentUserData;
@@ -66,7 +70,7 @@ import es.dmoral.toasty.Toasty;
  * Created by pramod on 10/2/18.
  */
 
-public class NavMapFragment extends Fragment implements OnMapReadyCallback,SharedPreferences.OnSharedPreferenceChangeListener,View.OnClickListener {
+public class NavMapFragment extends Fragment implements OnMapReadyCallback, SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener {
     View view;
     LatLng destLatLng;
     double currlat, currlng;
@@ -77,15 +81,16 @@ public class NavMapFragment extends Fragment implements OnMapReadyCallback,Share
     Snackbar snackbar = null;
     ProgressDialog pg;
     ArrayList<String> Places;
-    Button start,stop;
-    boolean flag=true;
+    Button start, stop;
+    boolean flag = true;
+
     @SuppressLint("MissingPermission")
     public View onCreateView(LayoutInflater inflater, ViewGroup conatainer, Bundle b) {
         view = inflater.inflate(R.layout.activity_navmapfragment, conatainer, false);
         destlat = new ArrayList<>();
         destlng = new ArrayList<>();
         Places = new ArrayList<>();
-        taskTitle=new ArrayList<>();
+        taskTitle = new ArrayList<>();
         pg = new ProgressDialog(getActivity());
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         new Handler().postDelayed(new Runnable() {
@@ -95,8 +100,8 @@ public class NavMapFragment extends Fragment implements OnMapReadyCallback,Share
                 mapFragment.getMapAsync(NavMapFragment.this);
             }
         }, 300);
-        start=view.findViewById(R.id.startdirectionButton);
-        stop=view.findViewById(R.id.stopdirectionButton);
+        start = view.findViewById(R.id.startdirectionButton);
+        stop = view.findViewById(R.id.stopdirectionButton);
         start.setOnClickListener(this);
         stop.setOnClickListener(this);
         start.setEnabled(false);
@@ -111,12 +116,16 @@ public class NavMapFragment extends Fragment implements OnMapReadyCallback,Share
         getActivity().setTitle("Map");
     }
 
-    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setMyLocationEnabled(true);
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.ACCESS_FINE_LOCATION},10);
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(21.7679, 78.8718), 4));
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         addMarkers();

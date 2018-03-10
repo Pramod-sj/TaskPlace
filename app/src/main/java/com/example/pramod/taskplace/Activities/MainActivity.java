@@ -1,18 +1,23 @@
 package com.example.pramod.taskplace.Activities;
 
+import android.Manifest;
 import android.app.Activity;
-import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -70,16 +75,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private CircleImageView circleImageView;
     private View header;
     private Uri ImagePATH;
-    private final int ALARM_ID=10;
     private final int SELECT_PHOTO=100;
     private AlertDialog alertDialog;
     private GoogleApiClient mGoogleApiClient;
-    private AlarmManager alarmManager=null;
     private PendingIntent pendingIntent=null;
     private TextView username,useremail;
     float time_backPressed;
     private static int backpressedCount=0;
-
     //Firebase
     private FirebaseStorage storage;
     private StorageReference storageReference;
@@ -88,18 +90,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        storage=FirebaseStorage.getInstance();
+        storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
-            public void onDrawerOpened(View drawerView){
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+            public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
             }
 
-            public void onDrawerClosed(View drawerView){
+            public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
             }
         };
@@ -108,35 +110,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.setVerticalScrollBarEnabled(false);
-        header=navigationView.getHeaderView(0);
-        circleImageView= header.findViewById(R.id.imageView);
+        header = navigationView.getHeaderView(0);
+        circleImageView = header.findViewById(R.id.imageView);
         circleImageView.setClickable(true);
         circleImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(),"Click",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Click", Toast.LENGTH_SHORT).show();
                 alertDialog.show();
             }
         });
-        username=header.findViewById(R.id.username);
-        useremail=header.findViewById(R.id.useremail);
+        username = header.findViewById(R.id.username);
+        useremail = header.findViewById(R.id.useremail);
         setUserProfile();
         //for notification
-        mGoogleApiClient=TaskPlace.getGoogleApiHelper().getGoogleApiClient();
+        mGoogleApiClient = TaskPlace.getGoogleApiHelper().getGoogleApiClient();
         mGoogleApiClient.connect();
-        String ScrollViewActivity=getIntent().getStringExtra("scrollView");
-        if(ScrollViewActivity!=null){
-            if(ScrollViewActivity.equals("scrollView")){
-                Fragment f = new ViewTaskFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.flContent, f).commit();
-            }
-        }
-        else {
-            navItem(R.id.set_navtask);
-        }
         //end
+        showFragment();
         //AlertDialog for image selection and upload
-        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Upload an Image");
         builder.setMessage("Please choose image from your gallery..:)");
         builder.setPositiveButton("Select", new DialogInterface.OnClickListener() {
@@ -153,8 +146,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 dialog.cancel();
             }
         });
-        alertDialog=builder.create();
-        if(!storage.getReference().child("images/" + new CurrentUserData(this).getCurrentUID()).equals(null)) {
+        alertDialog = builder.create();
+        if (!storage.getReference().child("images/" + new CurrentUserData(this).getCurrentUID()).equals(null)) {
             storage.getReference().child("images/" + new CurrentUserData(this).getCurrentUID()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
@@ -163,15 +156,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             });
         }
 
-        if(!checkPermissions()){
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_PERMISSIONS_REQUEST_CODE);
+    }
+    public void showFragment(){
+        String ScrollViewActivity = getIntent().getStringExtra("scrollView");
+        SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        if(prefs.getBoolean("firstlogin",true)){
+            prefs.edit().putBoolean("firstlogin",false).commit();
+            navItem(R.id.set_navtask);
         }
-        /*new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                coverImage();
+        else {
+            if (ScrollViewActivity != null || prefs.getBoolean("firstlogin",false)==false) {
+                navItem(R.id.view_navTask);
             }
-        },200);*/
+            else {
+                navItem(R.id.set_navtask);
+            }
+        }
+
     }
     public void setUserProfile(){
         Uri url=FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl();
@@ -189,35 +190,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             String[] name=currentUserData.getCurrentUserEmail().split("@");
             username.setText(name[0]);
         }
+        if(!checkPermissions(this)) {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 10);
+        }
     }
 
-    private boolean checkPermissions() {
-        int permissionState = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION);
+    public static boolean checkPermissions(Context context) {
+        int permissionState = ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION);
         return permissionState == PackageManager.PERMISSION_GRANTED;
     }
     protected void onResume(){
         super.onResume();
+        if(checkPermissions(this)) {
+            TaskPlace.getGoogleApiHelper().connect();
+            if(mGoogleApiClient.isConnected()) {
+                locationPermissionChecker(mGoogleApiClient, MainActivity.this);
+            }
+        }
+
         time_backPressed=0;
         backpressedCount=0;
-
-    }
-    @Override
-    public void onStart() {
-        super.onStart();
-        TaskPlace.getGoogleApiHelper().connect();
-        if(mGoogleApiClient.isConnected()) {
-            locationPermissionChecker(mGoogleApiClient, MainActivity.this);
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-
-        TaskPlace.getGoogleApiHelper().disconnect();
-        if(alarmManager!=null) {
-            alarmManager.cancel(pendingIntent);
-        }
-        super.onDestroy();
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
@@ -238,18 +230,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 uploadImage();
                 break;
             case REQUEST_PERMISSIONS_REQUEST_CODE:
-                switch (requestCode){
+                switch (resultCode){
                     case Activity.RESULT_OK:
-                        Toasty.success(getApplicationContext(),"Successfully granted required permission",Toast.LENGTH_SHORT).show();
+                        TaskPlace.getGoogleApiHelper().connect();
+                        if(mGoogleApiClient.isConnected()) {
+                            locationPermissionChecker(mGoogleApiClient, MainActivity.this);
+                        }
                         break;
                     case Activity.RESULT_CANCELED:
                         Toasty.error(getApplicationContext(),"This application requires prompted permission",Toast.LENGTH_SHORT).show();
 
                 }
                 break;
-            /*case ALARM_ID:
-                checkTime();
-                break;*/
         }
     }
     @Override
@@ -355,11 +347,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     });
         }
     }
-    public static void locationPermissionChecker(GoogleApiClient mGoogleApiClient, final Activity activity) {
+    public void locationPermissionChecker(GoogleApiClient mGoogleApiClient, final Activity activity) {
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(3000);
+        locationRequest.setFastestInterval(5000);
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
         builder.setAlwaysShow(true);
         PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
@@ -370,23 +362,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 final LocationSettingsStates state = result.getLocationSettingsStates();
                 switch (status.getStatusCode()) {
                     case LocationSettingsStatusCodes.SUCCESS:
-                        // All location settings are satisfied. The client can initialize location
-                        // requests here.
+                        //Toasty.success(MainActivity.this,"Successfully granted required permission",Toast.LENGTH_SHORT).show();
                         break;
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        // Location settings are not satisfied. But could be fixed by showing the user
-                        // a dialog.
                         try {
-                            // Show the dialog by calling startResolutionForResult(),
-                            // and check the result in onActivityResult().
                             status.startResolutionForResult(activity, REQUEST_PERMISSIONS_REQUEST_CODE);
                         } catch (Exception e) {
                             // Ignore the error.
                         }
                         break;
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        // Location settings are not satisfied. However, we have no way to fix the
-                        // settings so we won't show the dialog.
                         break;
                 }
             }
@@ -420,7 +405,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void logOutDialog(){
         AlertDialog.Builder builder=new AlertDialog.Builder(this)
                 .setCancelable(false)
-                .setTitle("LogOut")
+                .setTitle("Logout")
                 .setMessage("Do you want to logout")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
@@ -463,6 +448,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 ;
         builder.create();
         builder.show();
+
     }
 
     @Override

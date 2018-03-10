@@ -35,6 +35,9 @@ public class AboutActivity extends AppCompatActivity {
 
     protected void onStop(){
         super.onStop();
+    }
+    protected void onDestroy(){
         finish();
+        super.onDestroy();
     }
 }

@@ -34,6 +34,7 @@ import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.pramod.taskplace.ServiceNotification;
 import com.example.pramod.taskplace.TaskPlace;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -63,8 +64,6 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
     Context context;
     private static final String TAG = "LUBroadcastReceiver";
     public static final String ACTION_PROCESS_UPDATES = "com.example.pramod.taskplace.action" + ".PROCESS_UPDATES";
-    LocationRequest locationRequest;
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onReceive(final Context context, Intent intent) {
         this.context=context;
@@ -75,9 +74,9 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
                 int mode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE, 0);
                 Log.i("MODE", String.valueOf(mode));
                 if (mode == 0) {
-                    Toasty.error(context, "No way to get Location Updates", Toast.LENGTH_SHORT).show();
+                    Toasty.error(context, "No way to get Location Updates", Toast.LENGTH_LONG).show();
                 } else if (mode == 2) {
-                    Toasty.warning(context, "App may not work properly", Toast.LENGTH_SHORT).show();
+                    Toasty.warning(context, "App may not work properly", Toast.LENGTH_LONG).show();
                 } else if (mode == 1) {
                     Toasty.warning(context, "wait we are working on this mode for now change to GPS provider", Toast.LENGTH_LONG).show();
                 } else if (mode == 3) {
@@ -98,6 +97,8 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
                         LocationServiceMethods methods = new LocationServiceMethods(context, mGoogleApiClient);
                         methods.createLocationRequest();
                         methods.requestLocationUpdates();
+                        ServiceNotification notification=new ServiceNotification(context);
+                        notification.createServiceNotification();
                     }
                 }
             },1000);

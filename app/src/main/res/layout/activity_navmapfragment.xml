@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:orientation="horizontal"
         android:weightSum="2"
-        android:layout_margin="10dp">
+        android:layout_margin="6dp">
         <Button
             android:id="@+id/stopdirectionButton"
             android:layout_height="wrap_content"
