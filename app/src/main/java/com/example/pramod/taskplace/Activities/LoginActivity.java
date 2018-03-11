@@ -87,7 +87,6 @@ public class LoginActivity extends AppCompatActivity{
         lemail=findViewById(R.id.e_editText1);
         lpassword=findViewById(R.id.e_editText2);
         llogin=findViewById(R.id.login);
-        //lpg=findViewById(R.id.lprogressBar);
         itoReg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -98,16 +97,13 @@ public class LoginActivity extends AppCompatActivity{
         llogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //lpg.setVisibility(View.VISIBLE);
                 final String email_id=lemail.getText().toString();
                 String password_=lpassword.getText().toString();
                 if(TextUtils.isEmpty(email_id)){
-                    //lpg.setVisibility(View.GONE);
-                    Toasty.warning(getApplicationContext(),"Please enter your email id",Toast.LENGTH_SHORT).show();
+                     Toasty.warning(getApplicationContext(),"Please enter your email id",Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if(TextUtils.isEmpty(password_)){
-                    //lpg.setVisibility(View.GONE);
                     Toasty.warning(getApplicationContext(),"Please enter password",Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -116,7 +112,6 @@ public class LoginActivity extends AppCompatActivity{
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (!task.isSuccessful()) {
-                            //lpg.setVisibility(View.GONE);
                             progressDialog.cancel();
                             Toasty.error(getApplicationContext(), task.getException().getLocalizedMessage(), Toast.LENGTH_LONG).show();
                         }
@@ -173,7 +168,6 @@ public class LoginActivity extends AppCompatActivity{
         @Override
         protected Void doInBackground(Void... voids) {
             //super.doInBackground(Void... voids);
-
             FirebaseDatabaseHelper db=new FirebaseDatabaseHelper(LoginActivity.this);
             db.insertDataToOffline();
             Log.i("inBackground","foInBackground");
@@ -245,5 +239,9 @@ public class LoginActivity extends AppCompatActivity{
             }
         }
     }
-
+    @Override
+    protected void onStop(){
+        super.onStop();
+        finish();
+    }
 }

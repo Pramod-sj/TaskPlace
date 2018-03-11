@@ -276,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return true;
         }
         else if(id==R.id.exitOption){
-            System.exit(0);
+            exitDialog();
             return true;
         }
 
@@ -453,16 +453,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onBackPressed(){
-        if(backpressedCount<=1 && time_backPressed+2000>=System.currentTimeMillis()) {
-            Intent intent=new Intent(Intent.ACTION_MAIN);
-            intent.addCategory(Intent.CATEGORY_HOME);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-        }
-        else{
-            backpressedCount++;
-            Toasty.warning(MainActivity.this,"press again to exit",Toast.LENGTH_SHORT).show();
-        }
-        time_backPressed=System.currentTimeMillis();
+        exitDialog();
+    }
+    public void exitDialog(){
+        AlertDialog.Builder builder=new AlertDialog.Builder(this)
+                .setMessage("Do you want to exit")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        builder.show();
     }
 }
