@@ -208,12 +208,12 @@ public class ScrollingActivity extends AppCompatActivity {
         builder.show();
     }
     public void vibratePhone(){
-        long [] pattern={50,120,200,300};
+        long [] pattern={0,1000,900,1000,900,1000,900,1000,1000,900,1000,900,1000,900,1000,0};
         vibrator.vibrate(pattern,1);
     }
     public void playRingTone(){
         SharedPreferences preferences= PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String url=preferences.getString("notifications_new_message_ringtone","content://settings/system/notification_sound");
+        String url=preferences.getString("notifications_new_message_ringtone","content://settings/system/alarm_alert");
         mediaPlayer=MediaPlayer.create(getApplicationContext(), Uri.parse(url));
         mediaPlayer.start();
     }

@@ -52,6 +52,6 @@ dependencies {
     compile 'cat.ereza:customactivityoncrash:2.2.0'
     compile 'com.github.GrenderG:Toasty:1.2.8'
     compile 'com.akexorcist:googledirectionlibrary:1.1.1'
-
+    compile 'com.kevalpatel2106:ringtonepicker:1.1'
 }
 apply plugin: 'com.google.gms.google-services'

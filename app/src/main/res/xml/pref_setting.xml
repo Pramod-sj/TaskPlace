@@ -3,10 +3,10 @@
     <PreferenceCategory
         android:title="Notification Settings">
         <RingtonePreference
-            android:defaultValue="content://settings/system/notification_sound"
+            android:defaultValue="content://settings/system/alarm_alert"
             android:key="notifications_new_message_ringtone"
-            android:ringtoneType="notification"
-            android:summary="Change you notification sound"
+            android:ringtoneType="alarm"
+            android:summary="Change you alarm ringtone"
             android:title="@string/pref_title_ringtone" />
         <SwitchPreference
             android:defaultValue="true"

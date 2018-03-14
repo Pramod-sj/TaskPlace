@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
@@ -58,8 +59,10 @@ public class AlarmBroadCastReceiver extends BroadcastReceiver {
             notificationIntent.putExtra("task_id", task_id);
             notificationIntent.putExtra("NotifyPage", "fromNotif");
             notificationIntent.putExtra("not_type","2");
+
             PendingIntent notificationPendingIntent = PendingIntent.getActivity(mContext, 1, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            String url = preferences.getString("notifications_new_message_ringtone", "content://settings/system/notification_sound");
+            //Uri uri=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+            String url = preferences.getString("notifications_new_message_ringtone","content://settings/system/alarm_alert");
             NotificationCompat.Builder notification = new NotificationCompat.Builder(mContext, PRIMARY_CHANNEL);
             notification.setSmallIcon(R.drawable.ic_task_white_24dp);
             notification.setContentTitle(place);
@@ -70,7 +73,7 @@ public class AlarmBroadCastReceiver extends BroadcastReceiver {
             notification.setContentIntent(notificationPendingIntent);
             notification.setSound(Uri.parse(url));
             if (preferences.getBoolean("notifications_new_message_vibrate", true)) {
-                notification.setVibrate(new long[]{50, 120, 200, 300});
+                notification.setVibrate(new long[]{0,1000,900,1000,900,1000,900,1000,0});
             }
             getNotificationManager().notify(sr_no, notification.build());
             wakeUp();
