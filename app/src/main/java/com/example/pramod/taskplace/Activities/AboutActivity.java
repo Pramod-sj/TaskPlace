@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.widget.TextView;
 
+import com.example.pramod.taskplace.BuildConfig;
 import com.example.pramod.taskplace.R;
 
 /**
@@ -22,6 +24,8 @@ public class AboutActivity extends AppCompatActivity {
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        TextView version=findViewById(R.id.version);
+        version.setText("Version "+BuildConfig.VERSION_NAME);
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
