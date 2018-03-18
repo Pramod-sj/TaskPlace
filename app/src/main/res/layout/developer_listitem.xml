@@ -34,14 +34,6 @@
                 android:textStyle="bold"
                 android:padding="8dp"
                 android:textColor="#ffffff"/>
-
-            <ImageView
-                android:layout_margin="8dp"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentTop="true"
-                android:src="@drawable/splashlogo" />
         </RelativeLayout>
         <LinearLayout
             android:layout_width="match_parent"

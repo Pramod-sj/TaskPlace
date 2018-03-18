@@ -18,6 +18,7 @@ import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -48,22 +49,35 @@ public class ScrollingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_scrolling);
         vibrator= (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        fab = findViewById(R.id.fab);
+
         String page=getIntent().getStringExtra("NotifyPage");
-        b1=findViewById(R.id.deleteButton);
+
         if(page!=null) {
             if (page.equals("fromNotif")) {
                 if(Integer.parseInt(getIntent().getExtras().getString("not_type"))==1) {
                     flag = true;
                 }
+                if(flag) {
+                    vibratePhone();
+                    playRingTone();
+                }
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON|
+                        WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD|
+                        WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED|
+                        WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+                setContentView(R.layout.activity_scrolling);
+                fab = findViewById(R.id.fab);
+                b1=findViewById(R.id.deleteButton);
                 firebaseDataId = getIntent().getStringExtra("task_id");
                 b1.setVisibility(View.VISIBLE);
                 fab.setVisibility(View.GONE);
             }
         }
         else{
+            setContentView(R.layout.activity_scrolling);
+            fab = findViewById(R.id.fab);
+            b1=findViewById(R.id.deleteButton);
             firebaseDataId=getIntent().getExtras().getString("id");
             fab.setVisibility(View.VISIBLE);
             b1.setVisibility(View.GONE);
@@ -216,13 +230,6 @@ public class ScrollingActivity extends AppCompatActivity {
         String url=preferences.getString("notifications_new_message_ringtone","content://settings/system/alarm_alert");
         mediaPlayer=MediaPlayer.create(getApplicationContext(), Uri.parse(url));
         mediaPlayer.start();
-    }
-    public void onStart() {
-        super.onStart();
-        if(flag) {
-            vibratePhone();
-            playRingTone();
-        }
     }
     public void onDestroy() {
         if(flag) {

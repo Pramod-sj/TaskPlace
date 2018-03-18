@@ -41,8 +41,6 @@ public class TaskPlace extends Application {
                 .trackActivities(false) //default: false
                 .minTimeBetweenCrashesMs(1000) //default: 3000
                 .errorDrawable(R.drawable.customactivityoncrash_error_image) //default: bug image
-                //.restartActivity(MainActivity.class) //default: null (your app's launch activity)
-                //.errorActivity(CustomErrorActivity.class) //default: null (default error activity)
                 .eventListener(null) //default: null
                 .apply();
         CustomActivityOnCrash.install(this);

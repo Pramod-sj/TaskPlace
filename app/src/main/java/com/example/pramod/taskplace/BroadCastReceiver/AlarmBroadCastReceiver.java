@@ -9,9 +9,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.PowerManager;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
@@ -36,6 +38,7 @@ public class AlarmBroadCastReceiver extends BroadcastReceiver {
         place=intent.getExtras().getString("task_place");
         sr_no= Integer.parseInt(intent.getExtras().getString("sr_no"));
         showNotificationFromAlarm();
+
     }
     private NotificationManager getNotificationManager() {
         if (mNotificationManager == null) {
@@ -50,6 +53,8 @@ public class AlarmBroadCastReceiver extends BroadcastReceiver {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             channel = new NotificationChannel(PRIMARY_CHANNEL, mContext.getString(R.string.default_channel), NotificationManager.IMPORTANCE_MAX);
             channel.enableVibration(true);
+            channel.enableLights(true);
+            channel.setVibrationPattern(new long[]{0,1000,900,1000,900,1000,900,1000,0});
             channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             getNotificationManager().createNotificationChannel(channel);
         }
@@ -59,9 +64,7 @@ public class AlarmBroadCastReceiver extends BroadcastReceiver {
             notificationIntent.putExtra("task_id", task_id);
             notificationIntent.putExtra("NotifyPage", "fromNotif");
             notificationIntent.putExtra("not_type","2");
-
             PendingIntent notificationPendingIntent = PendingIntent.getActivity(mContext, 1, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            //Uri uri=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
             String url = preferences.getString("notifications_new_message_ringtone","content://settings/system/alarm_alert");
             NotificationCompat.Builder notification = new NotificationCompat.Builder(mContext, PRIMARY_CHANNEL);
             notification.setSmallIcon(R.drawable.ic_task_white_24dp);
@@ -95,6 +98,5 @@ public class AlarmBroadCastReceiver extends BroadcastReceiver {
             wl_cpu.acquire(10000);
         }
     }
-
 
 }
