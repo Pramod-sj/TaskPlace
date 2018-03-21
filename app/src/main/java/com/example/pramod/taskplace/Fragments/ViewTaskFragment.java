@@ -26,8 +26,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.example.pramod.taskplace.Adapters.TaskViewAdapter;
+import com.example.pramod.taskplace.LocationService.FusedLocationService;
 import com.example.pramod.taskplace.LocationService.LocationRequestHelper;
-import com.example.pramod.taskplace.LocationService.LocationServiceMethods;
 import com.example.pramod.taskplace.Model.CurrentUserData;
 import com.example.pramod.taskplace.Database.DatabaseHelper;
 import com.example.pramod.taskplace.R;
@@ -61,7 +61,7 @@ public class ViewTaskFragment extends Fragment implements SharedPreferences.OnSh
     TaskViewAdapter adapter;
     DatabaseHelper db;
     LinearLayout ll;
-    LocationServiceMethods methods;
+    //LocationServiceMethods methods;
     @SuppressLint("MissingPermission")
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.i("oncreateview","inside it");
@@ -83,7 +83,7 @@ public class ViewTaskFragment extends Fragment implements SharedPreferences.OnSh
         switchListener();
         listViewListener();
         //inistantiating LocationServiceMethods
-        methods=new LocationServiceMethods(getActivity(),mGoogleApiClient);
+        //methods=new LocationServiceMethods(getActivity(),mGoogleApiClient);
         return view;
     }
     public void listViewListener(){
@@ -110,7 +110,8 @@ public class ViewTaskFragment extends Fragment implements SharedPreferences.OnSh
 
         fetchOfflineData();
         if(!db.isDataExist()) {
-            methods.removeLocationUpdates();
+            //methods.removeLocationUpdates();
+            getActivity().stopService(new Intent(getActivity(), FusedLocationService.class));
             aSwitch.setClickable(false);
             aSwitch.setChecked(false);
             snackbar.show();
@@ -119,10 +120,14 @@ public class ViewTaskFragment extends Fragment implements SharedPreferences.OnSh
             snackbar.dismiss();
             if (LocationRequestHelper.getRequestingTrigger(getActivity()) == false) {
                 aSwitch.setChecked(true);
-                methods.requestLocationUpdates();
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    getActivity().startForegroundService(new Intent(getActivity(),FusedLocationService.class));
+                }else{
+                    getActivity().startService(new Intent(getActivity(),FusedLocationService.class));
+                }
             } else {
                 aSwitch.setChecked(false);
-                methods.removeLocationUpdates();
+                getActivity().stopService(new Intent(getActivity(), FusedLocationService.class));
             }
         }
     }
@@ -134,12 +139,16 @@ public class ViewTaskFragment extends Fragment implements SharedPreferences.OnSh
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
                 if(aSwitch.isChecked()){
-                    methods.createLocationRequest();
-                    methods.requestLocationUpdates();
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        getActivity().startForegroundService(new Intent(getActivity(),FusedLocationService.class));
+                    }else{
+                        getActivity().startService(new Intent(getActivity(),FusedLocationService.class));
+                    }
+
                 }
                 else {
                     LocationRequestHelper.setNotificationFlag(getActivity(),true);
-                    methods.removeLocationUpdates();
+                    getActivity().stopService(new Intent(getActivity(), FusedLocationService.class));
                 }
             }
         });

@@ -1,6 +1,7 @@
 package com.example.pramod.taskplace.Activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -13,8 +14,9 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatDelegate;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import com.example.pramod.taskplace.LocationService.FusedLocationService;
 import com.example.pramod.taskplace.LocationService.LocationRequestHelper;
-import com.example.pramod.taskplace.LocationService.LocationServiceMethods;
 import com.example.pramod.taskplace.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -84,25 +86,26 @@ public class SettingsActivity extends PreferenceActivity {
             public boolean onPreferenceClick(Preference preference) {
                 if(switchPreference.isChecked()){
                     editor.putBoolean("mode",true);
-                    if(mGoogleApiClient.isConnected()){
-                        LocationServiceMethods methods=new LocationServiceMethods(getApplicationContext(),mGoogleApiClient);
-                        if(LocationRequestHelper.getRequestingTrigger(getApplicationContext())==false) {
-                            methods.removeLocationUpdates();
-                            methods.createLocationRequest();
-                            methods.requestLocationUpdates();
+                    if(LocationRequestHelper.getRequestingTrigger(getApplicationContext())==false) {
+                        getApplicationContext().stopService(new Intent(getApplicationContext(), FusedLocationService.class));
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            getApplicationContext().startForegroundService(new Intent(getApplicationContext(), FusedLocationService.class));
+                        }else {
+                            getApplicationContext().startService(new Intent(getApplicationContext(), FusedLocationService.class));
                         }
                     }
                 }
                 else{
-                    editor.putBoolean("mode",false);
-                    if(mGoogleApiClient.isConnected()){
-                        LocationServiceMethods methods=new LocationServiceMethods(getApplicationContext(),mGoogleApiClient);
-                        if(LocationRequestHelper.getRequestingTrigger(getApplicationContext())==false) {
-                            methods.removeLocationUpdates();
-                            methods.createLocationRequest();
-                            methods.requestLocationUpdates();
+                    if(LocationRequestHelper.getRequestingTrigger(getApplicationContext())==false) {
+                        getApplicationContext().stopService(new Intent(getApplicationContext(), FusedLocationService.class));
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            getApplicationContext().startForegroundService(new Intent(getApplicationContext(), FusedLocationService.class));
+                        }else {
+                            getApplicationContext().startService(new Intent(getApplicationContext(), FusedLocationService.class));
                         }
                     }
+
                 }
                 return true;
             }

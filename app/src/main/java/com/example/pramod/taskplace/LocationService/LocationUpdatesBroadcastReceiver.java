@@ -60,9 +60,8 @@ import es.dmoral.toasty.Toasty;
  *  foreground.
  */
 public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
-    GoogleApiClient mGoogleApiClient;
     Context context;
-    private static final String TAG = "LUBroadcastReceiver";
+    private static final String TAG = "TaskPlace_LocationUpdate";
     public static final String ACTION_PROCESS_UPDATES = "com.example.pramod.taskplace.action" + ".PROCESS_UPDATES";
     @Override
     public void onReceive(final Context context, Intent intent) {
@@ -88,20 +87,16 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
 
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
             Log.i("Boot","After Boot");
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mGoogleApiClient = TaskPlace.getGoogleApiHelper().getGoogleApiClient();
-                    if(LocationRequestHelper.getRequestingTrigger(context)==false) {
-                        Log.i("after Boot","inside getRequesting Trigger");
-                        LocationServiceMethods methods = new LocationServiceMethods(context, mGoogleApiClient);
-                        methods.createLocationRequest();
-                        methods.requestLocationUpdates();
-                        ServiceNotification notification=new ServiceNotification(context);
-                        notification.createServiceNotification();
-                    }
+            if(LocationRequestHelper.getRequestingTrigger(context)==false) {
+                Log.i("after Boot","inside getRequesting Trigger");
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(new Intent(context, FusedLocationService.class));
                 }
-            },1000);
+                else {
+                    context.startService(new Intent(context, FusedLocationService.class));
+                }
+            }
+
         }
         if (intent.getAction().equals(ACTION_PROCESS_UPDATES)) {
             LocationResult result = LocationResult.extractResult(intent);

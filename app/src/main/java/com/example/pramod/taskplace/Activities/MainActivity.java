@@ -37,6 +37,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.pramod.taskplace.LocationService.FusedLocationService;
 import com.example.pramod.taskplace.Model.CurrentUserData;
 import com.example.pramod.taskplace.Fragments.NavMapFragment;
 import com.example.pramod.taskplace.Fragments.SetTaskFragment;
@@ -78,9 +79,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private final int SELECT_PHOTO=100;
     private AlertDialog alertDialog;
     private GoogleApiClient mGoogleApiClient;
-    private PendingIntent pendingIntent=null;
     private TextView username,useremail;
-    float time_backPressed;
     private static int backpressedCount=0;
     //Firebase
     private FirebaseStorage storage;
@@ -207,9 +206,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 locationPermissionChecker(mGoogleApiClient, MainActivity.this);
             }
         }
-
-        time_backPressed=0;
-        backpressedCount=0;
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
@@ -350,8 +346,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void locationPermissionChecker(GoogleApiClient mGoogleApiClient, final Activity activity) {
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(5000);
+        locationRequest.setInterval(FusedLocationService.DEFAULT_INTERVAL);
+        locationRequest.setFastestInterval(FusedLocationService.FASTEST_INTERVAL);
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
         builder.setAlwaysShow(true);
         PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());

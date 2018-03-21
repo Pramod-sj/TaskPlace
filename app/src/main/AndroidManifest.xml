@@ -9,7 +9,6 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <uses-sdk
         android:minSdkVersion="22"
         android:maxSdkVersion="26"
@@ -84,8 +83,7 @@
         <receiver
             android:name=".LocationService.LocationUpdatesBroadcastReceiver"
             android:directBootAware="true"
-            android:enabled="true"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.location.PROVIDERS_CHANGED" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -94,12 +92,13 @@
                 <action android:name="com.example.pramod.taskplace.Background_LocationService.LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES" />
             </intent-filter>
         </receiver>
-
         <activity
             android:name=".Activities.ScrollingActivity"
             android:label="@string/title_activity_scrolling"
             android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait"></activity>
+        <service android:name=".LocationService.FusedLocationService"
+            android:exported="false"/>
     </application>
 
 </manifest>
