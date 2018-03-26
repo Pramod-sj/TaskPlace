@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="viewtask"
+        android:enabled="true"
+        android:icon="@drawable/ic_viewtask_black_24dp"
+        android:shortcutShortLabel="@string/view_shortcut_short_label">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.expertprogramming.taskplace"
+            android:targetClass="com.expertprogramming.taskplace.Activities.MainActivity"/>
+    </shortcut>
+    <shortcut
+        android:shortcutId="settings"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_settings_black_24dp"
+        android:shortcutShortLabel="@string/settings_shortcut_short_label">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.expertprogramming.taskplace"
+            android:targetClass="com.expertprogramming.taskplace.Activities.SettingsActivity"/>
+    </shortcut>
+
+</shortcuts>

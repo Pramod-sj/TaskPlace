@@ -17,6 +17,11 @@
             android:id="@+id/view_navTask"
             android:icon="@drawable/ic_viewtask_black_24dp"
             android:title="View Task" />
+
+        <item
+            android:id="@+id/view_navHistoryTask"
+            android:icon="@drawable/ic_history_black_24dp"
+            android:title="History" />
     </group>
     <item android:title="Account">
         <menu>
