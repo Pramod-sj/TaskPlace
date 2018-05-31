@@ -1,24 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
     <shortcut
+        android:shortcutId="settask"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_set_task"
+        android:shortcutShortLabel="@string/set_shortcut_short_label">
+        <intent
+            android:action="com.expertprogramming.taskplace.settask"
+            android:targetPackage="com.expertprogramming.taskplace"
+            android:targetClass="org.expertprogramming.taskplace.Activities.MainActivity"/>
+    </shortcut>
+    <shortcut
         android:shortcutId="viewtask"
         android:enabled="true"
-        android:icon="@drawable/ic_viewtask_black_24dp"
+        android:icon="@drawable/ic_shortcut_view_task"
         android:shortcutShortLabel="@string/view_shortcut_short_label">
         <intent
-            android:action="android.intent.action.VIEW"
+            android:action="com.expertprogramming.taskplace.viewtask"
             android:targetPackage="com.expertprogramming.taskplace"
-            android:targetClass="com.expertprogramming.taskplace.Activities.MainActivity"/>
+            android:targetClass="org.expertprogramming.taskplace.Activities.MainActivity"/>
+    </shortcut>
+    <shortcut
+        android:shortcutId="history"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_history"
+        android:shortcutShortLabel="@string/history_shortcut_short_label">
+        <intent
+            android:action="com.expertprogramming.taskplace.history"
+            android:targetPackage="com.expertprogramming.taskplace"
+            android:targetClass="org.expertprogramming.taskplace.Activities.MainActivity"/>
     </shortcut>
     <shortcut
         android:shortcutId="settings"
         android:enabled="true"
-        android:icon="@drawable/ic_shortcut_settings_black_24dp"
+        android:icon="@drawable/ic_shortcut_settings"
         android:shortcutShortLabel="@string/settings_shortcut_short_label">
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.expertprogramming.taskplace"
-            android:targetClass="com.expertprogramming.taskplace.Activities.SettingsActivity"/>
+            android:targetClass="org.expertprogramming.taskplace.Activities.SettingsActivity"/>
     </shortcut>
 
 </shortcuts>

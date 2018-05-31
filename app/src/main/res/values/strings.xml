@@ -144,6 +144,17 @@
     </string-array>
     <string name="title_activity_scrolling">ScrollingActivity</string>
     <string name="action_settings">Settings</string>
-    <string name="settings_shortcut_short_label">Setting</string>
+    <!--Shortcut String-->
+    <string name="set_shortcut_short_label">Set Task</string>
     <string name="view_shortcut_short_label">View Task</string>
+    <string name="history_shortcut_short_label">History</string>
+    <string name="settings_shortcut_short_label">Setting</string>
+    <string name="donebutton">Done</string>
+
+
+    <string name="circleimagedesc">A fast circular ImageView perfect for profile images. This is based on RoundedImageView from Vince Mi which itself is based on techniques recommended by Romain Guy.</string>
+    <string name="picassodesc">A powerful image downloading and caching library for Android.</string>
+    <string name="customcrashdesc">"This library allows launching a custom activity when the app crashes, instead of showing the hated Unfortunately, X has stopped dialog.</string>
+    <string name="welcomescreendesc">An easy to use and customizable welcome screen for Android apps.</string>
+    <string name="toastydesc">An Customized Toast</string>
 </resources>

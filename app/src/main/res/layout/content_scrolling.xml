@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".Activities.ScrollingActivity"
+    tools:context="org.expertprogramming.taskplace.Activities.ScrollingActivity"
     tools:showIn="@layout/activity_scrolling">
     <LinearLayout
         android:orientation="vertical"
@@ -23,6 +23,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/TaskPlaceTextView"/>
+
+        <TextView
+            android:textSize="18dp"
+            android:layout_margin="@dimen/text_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/TaskPlaceAddressTextView"/>
         <TextView
             android:textSize="18dp"
             android:layout_margin="@dimen/text_margin"
