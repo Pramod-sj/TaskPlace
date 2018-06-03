@@ -8,7 +8,7 @@
         <intent
             android:action="com.expertprogramming.taskplace.settask"
             android:targetPackage="com.expertprogramming.taskplace"
-            android:targetClass="org.expertprogramming.taskplace.Activities.MainActivity"/>
+            android:targetClass="org.expertprogramming.taskplaceremainder.Activities.MainActivity"/>
     </shortcut>
     <shortcut
         android:shortcutId="viewtask"
@@ -18,7 +18,7 @@
         <intent
             android:action="com.expertprogramming.taskplace.viewtask"
             android:targetPackage="com.expertprogramming.taskplace"
-            android:targetClass="org.expertprogramming.taskplace.Activities.MainActivity"/>
+            android:targetClass="org.expertprogramming.taskplaceremainder.Activities.MainActivity"/>
     </shortcut>
     <shortcut
         android:shortcutId="history"
@@ -28,7 +28,7 @@
         <intent
             android:action="com.expertprogramming.taskplace.history"
             android:targetPackage="com.expertprogramming.taskplace"
-            android:targetClass="org.expertprogramming.taskplace.Activities.MainActivity"/>
+            android:targetClass="org.expertprogramming.taskplaceremainder.Activities.MainActivity"/>
     </shortcut>
     <shortcut
         android:shortcutId="settings"
@@ -38,7 +38,7 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.expertprogramming.taskplace"
-            android:targetClass="org.expertprogramming.taskplace.Activities.SettingsActivity"/>
+            android:targetClass="org.expertprogramming.taskplaceremainder.Activities.SettingsActivity"/>
     </shortcut>
 
 </shortcuts>

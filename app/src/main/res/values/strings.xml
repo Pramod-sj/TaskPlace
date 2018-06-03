@@ -1,14 +1,14 @@
 <resources>
     <string name="app_name">TaskPlace</string>
-    <string name="apikey">AIzaSyAg4vdxuQp5yUmNrMhQtrUhdtAOr9b7KIU</string>
-    <string name="web_client_id">810303124847-v10ouqpqqodiljch9r5l426mc8muro6u.apps.googleusercontent.com</string>
+    <string name="apikey">AIzaSyBULgwDzsjtOM3mUrhhPkmh3yfBS2lr20s</string>
+    <string name="directionapikey">AIzaSyA5nVoapT5OCh1Vw1CRnpWqej9fwms4tp8</string>
     <string name="login"><ul>Already have an account, login me</ul></string>
     <string name="register"><ul>Create new account</ul></string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="devOption">Developers</string>
     <string name="aboutapp">About</string>
-    <string name="appdetail">Never miss your task again...!</string>
+    <string name="appdetail">Never miss uh task again...!</string>
     <string name="appdevelopment">An app created by learners</string>
     <string-array name="devnames">
         <item>Pramod Singh Jantwal</item>
@@ -157,4 +157,5 @@
     <string name="customcrashdesc">"This library allows launching a custom activity when the app crashes, instead of showing the hated Unfortunately, X has stopped dialog.</string>
     <string name="welcomescreendesc">An easy to use and customizable welcome screen for Android apps.</string>
     <string name="toastydesc">An Customized Toast</string>
+    <string name="googledirectiondesc">Android Library for Google Maps Direction API for using Google Maps for Android.</string>
 </resources>

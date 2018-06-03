@@ -6,7 +6,7 @@
             android:defaultValue="content://settings/system/alarm_alert"
             android:key="notifications_new_message_ringtone"
             android:ringtoneType="alarm"
-            android:summary="Change you alarm ringtone"
+            android:summary="Change your alarm ringtone"
             android:title="@string/pref_title_ringtone" />
         <SwitchPreference
             android:defaultValue="true"
@@ -17,7 +17,9 @@
             android:key="not_type"
             android:entryValues="@array/not_type_value"
             android:entries="@array/not_type_name"
-            android:title="Notification Type"/>
+            android:title="Notification Type"
+            android:summary="change type of notification"
+            />
     </PreferenceCategory>
     <PreferenceCategory
         android:title="Accuracy Setting">
@@ -31,7 +33,7 @@
             />
         <SwitchPreference
             android:title="Battery Saving"
-            android:summary="Save some bettery but may lead to less acure notifications"
+            android:summary="Save some bettery but may lead to improper notifications"
             android:key="mode"
             android:defaultValue="false"/>
     </PreferenceCategory>

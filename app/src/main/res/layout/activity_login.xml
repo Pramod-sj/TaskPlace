@@ -26,7 +26,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_margin="3dp">
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/e_emailWrapper"
                     android:layout_width="match_parent"
@@ -106,7 +107,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/register"
-            android:textSize="15dp"
+            android:textSize="12dp"
             android:layout_marginTop="20dp"
             android:textAlignment="center" />
     </LinearLayout>

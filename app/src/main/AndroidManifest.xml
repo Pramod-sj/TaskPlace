@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.expertprogramming.taskplace">
-    <uses-permission android:name="android.permission.INTERNET" />
+    package="org.expertprogramming.taskplaceremainder">
+    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -12,10 +12,10 @@
     <uses-permission android:name="android.permission.INSTALL_SHORTCUT"/>
     <uses-sdk
         android:minSdkVersion="22"
-        android:maxSdkVersion="26"
+        android:maxSdkVersion="27"
         />
     <application
-        android:name="org.expertprogramming.taskplace.TaskPlace"
+        android:name="org.expertprogramming.taskplaceremainder.TaskPlace"
         android:allowClearUserData="true"
         android:allowBackup="true"
         android:label="@string/app_name"
@@ -26,19 +26,19 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAg4vdxuQp5yUmNrMhQtrUhdtAOr9b7KIU" />
-        <receiver android:name="org.expertprogramming.taskplace.BroadCastReceiver.AlarmBroadCastReceiver"/>
+            android:value="AIzaSyBULgwDzsjtOM3mUrhhPkmh3yfBS2lr20s" />
+        <receiver android:name="org.expertprogramming.taskplaceremainder.BroadCastReceiver.AlarmBroadCastReceiver"/>
         <activity
-            android:name="org.expertprogramming.taskplace.Activities.LoginActivity"
+            android:name="org.expertprogramming.taskplaceremainder.Activities.LoginActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden"/>
         <activity
-            android:name="org.expertprogramming.taskplace.Activities.SignupActivity"
+            android:name="org.expertprogramming.taskplaceremainder.Activities.SignupActivity"
             android:screenOrientation="portrait"
 
             android:windowSoftInputMode="stateHidden"/>
         <activity
-            android:name="org.expertprogramming.taskplace.Activities.MainActivity"
+            android:name="org.expertprogramming.taskplaceremainder.Activities.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden"
@@ -46,10 +46,10 @@
 
         </activity>
         <activity
-            android:name="org.expertprogramming.taskplace.Activities.DevPageActivity"
+            android:name="org.expertprogramming.taskplaceremainder.Activities.DevPageActivity"
             android:screenOrientation="portrait"/>
         <activity
-            android:name="org.expertprogramming.taskplace.Activities.SplashScreen"
+            android:name="org.expertprogramming.taskplaceremainder.Activities.SplashScreen"
             android:theme="@style/SplashScreen"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -62,20 +62,20 @@
                 android:resource="@xml/shortcuts"/>
         </activity>
         <activity
-            android:name="org.expertprogramming.taskplace.Activities.AboutActivity"
+            android:name="org.expertprogramming.taskplaceremainder.Activities.AboutActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name="org.expertprogramming.taskplace.Activities.OpenLibraries_Activity"
+        <activity android:name="org.expertprogramming.taskplaceremainder.Activities.OpenLibraries_Activity"
             android:screenOrientation="portrait"/>
         <activity
-            android:name="org.expertprogramming.taskplace.Activities.SettingsActivity"
+            android:name="org.expertprogramming.taskplaceremainder.Activities.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:screenOrientation="portrait"/>
         <activity
-            android:name="org.expertprogramming.taskplace.Activities.StartPage"
+            android:name="org.expertprogramming.taskplaceremainder.Activities.StartPage"
             android:theme="@style/SampleWelcomeScreenTheme"
             android:screenOrientation="portrait"/>
         <activity
-            android:name="org.expertprogramming.taskplace.CustomErrorActivity"
+            android:name="org.expertprogramming.taskplaceremainder.Activities.CustomErrorActivity"
             android:label="@string/error_title"
             android:process=":error_activity"
             android:screenOrientation="portrait">
@@ -87,7 +87,7 @@
         </activity>
 
         <receiver
-            android:name="org.expertprogramming.taskplace.LocationService.LocationUpdatesBroadcastReceiver"
+            android:name="org.expertprogramming.taskplaceremainder.LocationService.LocationUpdatesBroadcastReceiver"
             android:directBootAware="true"
             android:exported="false">
             <intent-filter>
@@ -99,11 +99,11 @@
             </intent-filter>
         </receiver>
         <activity
-            android:name="org.expertprogramming.taskplace.Activities.ScrollingActivity"
+            android:name="org.expertprogramming.taskplaceremainder.Activities.ScrollingActivity"
             android:label="@string/title_activity_scrolling"
             android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait"></activity>
-        <service android:name="org.expertprogramming.taskplace.LocationService.FusedLocationService"
+        <service android:name="org.expertprogramming.taskplaceremainder.LocationService.FusedLocationService"
             android:exported="false"/>
     </application>
 

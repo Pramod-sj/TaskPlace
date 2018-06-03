@@ -1,39 +1,39 @@
 {
   "project_info": {
-    "project_number": "810303124847",
-    "firebase_url": "https://taskloc-ee79b.firebaseio.com",
-    "project_id": "taskloc-ee79b",
-    "storage_bucket": "taskloc-ee79b.appspot.com"
+    "project_number": "1057237923576",
+    "firebase_url": "https://taskplace-e191b.firebaseio.com",
+    "project_id": "taskplace-e191b",
+    "storage_bucket": "taskplace-e191b.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:810303124847:android:933999f5da974261",
+        "mobilesdk_app_id": "1:1057237923576:android:8d323fb789e00d7a",
         "android_client_info": {
-          "package_name": "com.expertprogramming.taskplace"
+          "package_name": "org.expertprogramming.taskplaceremainder"
         }
       },
       "oauth_client": [
         {
-          "client_id": "810303124847-plo4rel32lgtngurpqtvunghdmpm95g1.apps.googleusercontent.com",
+          "client_id": "1057237923576-d0gqb8om372ps5j754odu1r4vjubsgn3.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.expertprogramming.taskplace",
+            "package_name": "org.expertprogramming.taskplaceremainder",
             "certificate_hash": "1b7da5bd8963c0f72885c1e180be4273a278e74a"
           }
         },
         {
-          "client_id": "810303124847-v10ouqpqqodiljch9r5l426mc8muro6u.apps.googleusercontent.com",
+          "client_id": "1057237923576-2h5en0limgg4ghge96egnj4t84nuql2k.apps.googleusercontent.com",
           "client_type": 3
         },
         {
-          "client_id": "810303124847-v10ouqpqqodiljch9r5l426mc8muro6u.apps.googleusercontent.com",
+          "client_id": "1057237923576-2h5en0limgg4ghge96egnj4t84nuql2k.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAg4vdxuQp5yUmNrMhQtrUhdtAOr9b7KIU"
+          "current_key": "AIzaSyBs6PLq8Bb_RUbyDuLd3csqgMGK7kQasmk"
         }
       ],
       "services": {
@@ -44,45 +44,10 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "810303124847-v10ouqpqqodiljch9r5l426mc8muro6u.apps.googleusercontent.com",
+              "client_id": "1057237923576-2h5en0limgg4ghge96egnj4t84nuql2k.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:810303124847:android:02cfbcdce7885f14",
-        "android_client_info": {
-          "package_name": "org.expertprogramming.taskplace"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "810303124847-v10ouqpqqodiljch9r5l426mc8muro6u.apps.googleusercontent.com",
-          "client_type": 3
-        },
-        {
-          "client_id": "810303124847-v10ouqpqqodiljch9r5l426mc8muro6u.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAg4vdxuQp5yUmNrMhQtrUhdtAOr9b7KIU"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
         },
         "ads_service": {
           "status": 2
