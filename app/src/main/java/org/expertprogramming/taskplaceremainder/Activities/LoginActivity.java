@@ -239,10 +239,10 @@ public class LoginActivity extends AppCompatActivity{
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
-                // Google Sign In failed, update UI appropriately
-                Log.w("Google signin", "Google sign in failed", e);
-                Toasty.warning(getApplicationContext(),"please select your gmail id",Toast.LENGTH_SHORT).show();
+                Log.i("Error Code", String.valueOf(e.getStatusCode()));
 
+                Log.i("Error Code", String.valueOf(e.getStatusMessage()));
+                Toasty.warning(getApplicationContext(),"Please update your google service", Toast.LENGTH_SHORT).show();
             }
         }
     }

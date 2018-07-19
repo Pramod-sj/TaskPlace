@@ -65,7 +65,6 @@ public class NavMapFragment extends Fragment implements OnMapReadyCallback, Shar
     Button start, stop;
     boolean flag = true;
 
-    @SuppressLint("MissingPermission")
     public View onCreateView(LayoutInflater inflater, ViewGroup conatainer, Bundle b) {
         view = inflater.inflate(R.layout.activity_navmapfragment, conatainer, false);
         destlat = new ArrayList<>();
